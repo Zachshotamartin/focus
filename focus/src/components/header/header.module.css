@@ -1,0 +1,73 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background-color: #1a1a1a;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid white;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-top: 2rem;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  height: 4rem;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  text-align: left;
+  padding-left: 1rem;
+}
+
+.profileContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding-left: 2rem;
+  
+
+  height: 2rem;
+}
+
+.email {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-right: 1rem;
+  color: white;
+}
+
+.profileImage {
+  width: 30px; /* Adjust size */
+  height: 30px; /* Adjust size */
+  border-radius: 10px;
+  margin-left: 2rem; /* Space between the text and image */
+  margin-right: 0.5rem;
+}
+
+.logo {
+  width: 50px; /* Adjust size */
+  height: 50px; /* Adjust size */
+  margin-left: 2rem;
+}

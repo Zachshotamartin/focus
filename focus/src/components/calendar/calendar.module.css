@@ -1,0 +1,120 @@
+.calendar {
+  flex: 6;
+  height: 100%;
+  width: 100%; /* Full width of parent container */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Optional: Center the calendar */
+  align-items: flex-start; /* Optional: Center the calendar */
+  background-color: #2b2b2b; /* Light gray background like Google Calendar */
+  overflow-y: auto;
+  padding-top: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 2rem;
+}
+
+.tasks {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: flex-start;
+  overflow-y: scroll;
+  padding-top: 1rem;
+  height: 100%;
+  width: 100%;
+}
+.quickAdd {
+  flex: 1;
+  height: 100%;
+  width: 50%; /* Full width of parent container */
+  display: flex;
+  flex-direction: row;
+  justify-content: center; /* Optional: Center the calendar */
+  align-items: center; /* Optional: Center the calendar */
+  background-color: #2b2b2b; /* Light gray background like Google Calendar */
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+}
+.naturalLanguageInput {
+  flex: 1;
+  height: 100%;
+  width: 100%; /* Full width of parent container */
+  display: flex;
+  flex-direction: row;
+  justify-content: center; /* Optional: Center the calendar */
+  align-items: center; /* Optional: Center the calendar */
+  background-color: #2b2b2b; /* Light gray background like Google Calendar */
+  border: 1px solid white;
+  border-radius: 10px;
+  margin-right: 1rem;
+  resize: none;
+  font-size: 1rem;
+
+  padding-left: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.tasksContainer {
+  flex: 1;
+  height: 100%;
+  width: 100%; /* Full width of parent container */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Optional: Center the calendar */
+  align-items: flex-start; /* Optional: Center the calendar */
+
+}
+/* Toolbar (navigation bar) */
+
+.taskList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.calendarWrapper {
+  border-radius: 20px;
+  position: relative;
+  z-index: 100;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.422);
+  height: 100%;
+  width: 100%;
+}
+
+.profileContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding-left: 2rem;
+  width: 50%;
+
+  height: 100%;
+}
+
+.email {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-right: 1rem;
+  color: white;
+}
+
+.profileImage {
+  width: 30px; /* Adjust size */
+  height: 30px; /* Adjust size */
+  border-radius: 10px;
+  margin-left: 2rem; /* Space between the text and image */
+  margin-right: 0.5rem;
+}
+
+.topRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
