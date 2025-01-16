@@ -79,8 +79,10 @@ function GoogleCalendar() {
               end: event.end.dateTime || event.end.date,
               allDay: !event.start.dateTime,
               description: event.description,
+
               extendedProperties: event.extendedProperties,
             }));
+            console.log("repeats", mappedEvents);
             dispatch(setCalendarEvents(mappedEvents));
             const newTasks = mappedEvents.filter(
               (event: any) =>
@@ -258,7 +260,12 @@ function GoogleCalendar() {
                     {" "}
                     View all tasks
                   </button>
-                  <button onClick={() => dispatch(setAllTasks(false))}>
+                  <button
+                    onClick={() => {
+                      dispatch(setSelectedEvent(tasks[0]));
+                      dispatch(setAllTasks(false));
+                    }}
+                  >
                     {" "}
                     Swipe{" "}
                   </button>

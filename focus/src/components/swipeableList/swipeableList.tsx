@@ -20,7 +20,11 @@ const SwipeableList = () => {
 
   useEffect(() => {
     console.log("selectedEvent", selectedEvent);
-  }, [selectedEvent]);
+    if (!selectedEvent) {
+      dispatch(setSelectedEvent(tasks[0]));
+      setShownTaskIndex(0);
+    }
+  }, [dispatch, selectedEvent, tasks]);
   useEffect(() => {
     setViewTasks(tasks);
   }, [tasks]);
@@ -45,6 +49,7 @@ const SwipeableList = () => {
           if (response.ok) {
             console.log("Event deleted successfully");
             dispatch(removeTask(viewTasks[shownTaskIndex]));
+            dispatch(setSelectedEvent(tasks(viewTasks[shownTaskIndex])));
             dispatch(removeCalendarEvent());
             setShownTaskIndex((prev) =>
               prev >= viewTasks.length - 1 ? 0 : prev
@@ -72,7 +77,7 @@ const SwipeableList = () => {
     <div className={styles.container}>
       {viewTasks.length > 0 ? (
         <SwipeableTaskItem
-          task={selectedEvent}
+          task={selectedEvent ? viewTasks[0] : selectedEvent}
           handleNext={handleRandomNextTask}
           handleDelete={handleDelete}
         />
