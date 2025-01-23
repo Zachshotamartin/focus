@@ -11,6 +11,45 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --main-page-bg-color: #211e21;
+  --fc-small-font-size: 0.85em;
+  --fc-page-bg-color: #2b2b2b;
+  --fc-neutral-bg-color: #232323;
+  --fc-neutral-text-color: #808080;
+  --fc-border-color: #464646;
+
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: #2b2b2b;
+  --fc-button-border-color: #ccc;
+  --fc-button-hover-bg-color: #475569;
+  --fc-button-hover-border-color: #ccc;
+  --fc-button-active-bg-color: #475569;
+  --fc-button-active-border-color: #ccc
+
+  --fc-event-bg-color: #007e79;
+  --fc-event-border-color: #ffffff;
+  --fc-event-text-color: #fff;
+  --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
+
+  --fc-more-link-bg-color: #d0d0d0;
+  --fc-more-link-text-color: inherit;
+
+  --fc-event-resizer-thickness: 8px;
+  --fc-event-resizer-dot-total-width: 8px;
+  --fc-event-resizer-dot-border-width: 1px;
+
+  --fc-non-business-color: rgba(215, 215, 215, 0.3);
+  --fc-bg-event-color: rgb(143, 223, 130);
+  --fc-bg-event-opacity: 0.3;
+  --fc-highlight-color: rgba(188, 232, 241, 0.3);
+  --fc-today-bg-color: #47556939;
+  --fc-now-indicator-color: red;
+}
+.fc-month-button:focus {
+  outline: none; /* Removes the default focus outline */
+  border: none; /* Remove any border if you want to avoid it */
+  /* Optionally, add your custom border or style for the selected button */
+  
 }
 * {
   box-sizing: border-box;
@@ -18,11 +57,9 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
 }
 
 body {
@@ -72,272 +109,37 @@ textarea:focus {
 }
 /* calendar */
 
-.rbc-toolbar {
-  background-color: #2b2b2b;
-  color: white;
-  padding: 10px;
-  font-family: Arial, sans-serif;
-  border-radius: 5px;
-  margin-bottom: 1rem !important;
+
+a.fc-event.fc-daygrid-event[href] {
+  color: #c90064;
 }
 
-.rbc-toolbar button:hover {
-  background-color: #475569; /* Darker blue on hover */
+a.fc-event.fc-daygrid-event[href]:visited {
+  color: #9c3dd3;
 }
 
-.rbc-btn-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.rbc-btn-group button {
-  flex: 1;
-  margin: 0 5px;
-  padding: 5px 10px;
-  border-radius: 3px;
-  border: none;
-  background-color: #242424 !important; /* Blue background */
-  color: white !important;
-  cursor: pointer;
+.fc .fc-daygrid-day.fc-day-other {
+  background: var(--fc-neutral-bg-color);
 }
 
-.rbc-btn-group button:hover {
-  background-color: #475569 !important; /* Darker blue on hover */
+.fc .fc-scrollgrid-section-sticky > * {
+  background: unset;
+  position: sticky;
+  z-index: 3;
 }
 
-.rbc-btn-group button.rbc-active {
-  background-color: #475569 !important; /* Even darker blue on active */
-  color: white !important;
+:not(td[aria-labelledby]) > .fc-daygrid-day-frame {
+  background: var(--fc-neutral-bg-color);
 }
 
-.rbc-toolbar-label {
-  flex: 1;
-  text-align: center;
-  font-weight: bold;
-  font-size: 16px;
+.fc .fc-scrollgrid-section-body {
+  background: var(--fc-page-bg-color);
 }
 
-/* Month view grid styling */
-.rbc-month-view {
-  font-family: "Roboto", sans-serif;
-  border: none !important;
-  height: 100%;
-  background-color: transparent; /* Avoid conflicting with wrapper's background */
-  overflow-x: hidden;
-  overflow-y: hidden;
-  border-radius: 50px;
-
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
-    /* Bottom shadow */ 0 -4px 8px rgba(0, 0, 0, 0.2),
-    /* Top shadow */ 4px 0 8px rgba(0, 0, 0, 0.2),
-    /* Right shadow */ -4px 0 8px rgba(0, 0, 0, 0.2); /* Left shadow */
+.fc .fc-timegrid-slot-label,
+.fc .fc-timegrid-axis-frame {
+  background-color: var(--main-page-bg-color);
 }
-
-.rbc-time-view {
-  font-family: "Roboto", sans-serif;
-  border: none !important;
-  height: 100%;
-  background-color: transparent; /* Avoid conflicting with wrapper's background */
-  overflow-x: hidden;
-  overflow-y: hidden;
-
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.rbc-row {
-}
-
-.rbc-month-header {
-  border: none;
-}
-
-.rbc-header {
-  background-color: #242424;
-  text-align: center;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-top: none !important;
-  padding: 5px;
-  border-right: none !important;
-  border-left: none !important;
-
-  color: white;
-}
-
-.rbc-month-row {
-}
-
-.rbc-row-bg {
-}
-.rbc-day-bg {
-  background-color: #212121 !important;
-  color: white !important;
-}
-.rbc-off-range-bg {
-  background-color: #475569 !important;
-}
-.rbc-row-content {
-}
-
-.rbc-date-cell {
-  color: white !important;
-  padding-right: 0.5rem !important;
-  padding-top: 0.5rem !important;
-}
-/* Time grid (week/day view) */
-.rbc-time-view {
-  background-color: #242424;
-}
-.rbc-time-header {
-}
-.rbc-label {
-}
-.rbc-time-header-gutter {
-}
-.rbc-time-header-content {
-}
-.rbc-time-header-cell {
-  color: white !important;
-  background-color: #242424 !important;
-}
-.rbc-all-day-cell {
-}
-
-.rbc-time-content {
-  background-color: #242424;
-  /* border: 1px solid rgba(255, 255, 255, 0.422) !important; */
-}
-.rbc-time-gutter {
-  background-color: #242424 !important;
-  color: white !important;
-}
-.rbc-time-column {
-  background-color: #242424 !important;
-}
-.rbc-time-slot {
-  background-color: #242424 !important;
-  color: white !important;
-  /* border: 1px solid rgba(255, 255, 255, 0.422) !important; */
-}
-.rbc-timeslot-group {
-  background-color: #242424;
-
-  /* border: 1px solid rgba(255, 255, 255, 0.422) !important; */
-}
-.rbc-day-slot {
-}
-.rbc-events-container {
-}
-.rbc-selected {
-}
-.rbc-now {
-}
-
-.rbc-today {
-}
-
-.rbc-current-time-indicator {
-}
-.rbc-agenda-empty {
-  background-color: #242424 !important;
-  color: white !important;
-}
-.rbc-agenda-view {
-  font-family: "Roboto", sans-serif;
-  border: none !important;
-  height: 100%;
-  background-color: transparent; /* Avoid conflicting with wrapper's background */
-  overflow-x: hidden;
-  overflow-y: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.rbc-agenda-table {
-}
-.rbc-agenda-content {
-  color: white !important;
-  text-align: left;
-}
-.rbc-agenda-date-cell {
-  color: white !important;
-  align-items: center;
-  justify-content: center;
-}
-.rbc-agenda-time-cell {
-  color: white !important;
-}
-.rbc-agenda-event-cell {
-  color: white !important;
-}
-
-/* Today's date styling */
-.rbc-today {
-  background-color: #3e3e3e !important; /* Light blue */
-  color: white !important;
-  /* border: 1px solid rgba(255, 255, 255, 0.422) !important; */
-}
-
-/* Weekend day styling */
-.rbc-day-bg:nth-child(7n + 6),
-.rbc-day-bg:nth-child(7n + 7) {
-  background-color: #f8f9fa; /* Light gray for weekends */
-}
-
-/* Events styling */
-.rbc-event {
-  background-color: transparent; /* Blue */
-  color: white;
-  border-radius: 4px;
-  padding: 2px;
-  font-size: 12px;
-  text-align: center;
-  z-index: 1;
-}
-
-.rbc-event:hover {
-  background-color: #0056b3;
-  cursor: pointer;
-}
-.rbc-event:focus {
-  outline: none;
-}
-
-/* Popup event list styling */
-.rbc-overlay {
-  background-color: white;
-  border: 1px solid #ccc;
-  /* border: 1px solid rgba(255, 255, 255, 0.422) !important; */
-  padding: 10px;
-  border-radius: 5px;
-}
-
-/* Time grid (week/day view) */
-.rbc-time-content {
-  background-color: #f8f9fa;
-  border-top: 1px solid rgba(255, 255, 255, 0.422) !important;
-}
-
-.rbc-current-time-indicator {
-  background-color: red !important;
-  height: 2px;
-}
-
-/* Selected cells styling */
-.rbc-selected-cell {
-  background-color: red;
-}
-
-/* Event content styling */
-.rbc-event-content {
-  font-weight: bold;
-  font-size: 14px;
-}
-
-/* Custom day cells (hover effect) */
-.rbc-day-bg:hover {
-  background-color: #e8f4ff;
-  cursor: pointer;
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -348,5 +150,151 @@ textarea:focus {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+/* Default styles for larger screens */
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+h5 {
+  font-size: 1.25rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+p,
+span,
+input,
+textarea,
+button,
+label,
+select {
+  font-size: 1rem;
+}
+
+/* Medium screens (tablets, smaller laptops) */
+@media screen and (max-width: 1024px) {
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  h3 {
+    font-size: 1.6rem;
+  }
+
+  h4 {
+    font-size: 1.4rem;
+  }
+
+  h5 {
+    font-size: 1.2rem;
+  }
+
+  h6 {
+    font-size: 0.95rem;
+  }
+
+  p,
+  span,
+  input,
+  textarea,
+  button,
+  label,
+  select {
+    font-size: 0.95rem;
+  }
+}
+
+/* Small screens (phones, smaller tablets) */
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+  }
+
+  h4 {
+    font-size: 1.2rem;
+  }
+
+  h5 {
+    font-size: 1.1rem;
+  }
+
+  h6 {
+    font-size: 0.85rem;
+  }
+
+  p,
+  span,
+  input,
+  textarea,
+  button,
+  label,
+  select {
+    font-size: 0.85rem;
+  }
+}
+
+/* Extra small screens (very small phones) */
+@media screen and (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  h4 {
+    font-size: 1rem;
+  }
+
+  h5 {
+    font-size: 0.9rem;
+  }
+
+  h6 {
+    font-size: 0.8rem;
+  }
+
+  p,
+  span,
+  input,
+  textarea,
+  button,
+  label,
+  select {
+    font-size: 0.8rem;
   }
 }

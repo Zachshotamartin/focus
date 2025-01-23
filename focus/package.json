@@ -11,6 +11,11 @@
   },
   "dependencies": {
     "@descope/react-sdk": "^2.3.11",
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@reduxjs/toolkit": "^2.5.0",
     "axios": "^1.7.9",
     "js-cookie": "^3.0.5",

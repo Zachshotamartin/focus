@@ -23,7 +23,7 @@ const MainPage = () => {
   ) => {
     try {
       const response = await fetch(
-        "https://focus-447201.wl.r.appspot.com/schedule/ai-suggest",
+        "http://localhost:8080/schedule/ai-suggest",
         {
           method: "POST",
           headers: {
@@ -157,7 +157,7 @@ const MainPage = () => {
 
       console.log("Request Body:", requestBody); // Log the request body to check
 
-      const response = await fetch("https://focus-447201.wl.r.appspot.com/calendar/event", {
+      const response = await fetch("http://localhost:8080/calendar/event", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

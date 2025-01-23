@@ -36,7 +36,7 @@ const SwipeableList = () => {
       if (token) {
         try {
           const response = await fetch(
-            `https://focus-447201.wl.r.appspot.com/calendar/event/${tasks[shownTaskIndex].id}`,
+            `http://localhost:8080/calendar/event/${tasks[shownTaskIndex].id}`,
             {
               method: "DELETE",
               headers: {

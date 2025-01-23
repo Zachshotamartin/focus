@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import Fullcalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styles from "./calendar.module.css";
@@ -16,8 +18,6 @@ import {
 } from "../../reducers/eventsSlice";
 
 import { setAllTasks } from "../../reducers/pageStateSlice";
-
-const localizer = momentLocalizer(moment);
 
 function GoogleCalendar() {
   const dispatch = useDispatch();
@@ -66,7 +66,7 @@ function GoogleCalendar() {
       if (token) {
         try {
           const response = await fetch(
-            `https://focus-447201.wl.r.appspot.com/calendar?token=${token}`
+            `http://localhost:8080/calendar?token=${token}`
           );
           const data = await response.json();
           console.log("data", data.items);
@@ -142,17 +142,14 @@ function GoogleCalendar() {
     }
 
     try {
-      const response = await fetch(
-        "https://focus-447201.wl.r.appspot.com/calendar/quickadd",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ text: naturalLanguageInput }),
-        }
-      );
+      const response = await fetch("http://localhost:8080/calendar/quickadd", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: naturalLanguageInput }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -220,34 +217,25 @@ function GoogleCalendar() {
               )}
             </div>
           </div>
-
-          <Calendar
-            className={styles["react-big-calendar"]}
-            localizer={localizer}
-            events={events}
-            onSelectEvent={(event) => {
-              dispatch(
-                setSelectedEvent({
-                  ...event,
-                  start: event.start.toISOString(),
-                  end: event.end.toISOString(),
-                })
-              );
-              console.log(event);
-            }}
-            onSelectSlot={handleSelect}
-            defaultView="month"
-            selectable={true}
-            style={{
-              height: "100%",
-              width: "100%",
-              position: "relative",
-              zIndex: 20,
-            }}
-            components={{
-              event: ({ event }) => <div>{event.title}</div>,
-            }}
-          />
+          <div style={{ width: "100%" }}>
+            <Fullcalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              initialView={"dayGridMonth"}
+              events={events}
+              selectable={true}
+              select={handleSelect}
+              selectMirror={true}
+              
+              handleWindowResize={true}
+              headerToolbar={{
+                start: "today prev,next", // will normally be on the left. if RTL, will be on the right
+                center: "title",
+                end: "dayGridMonth,timeGridWeek,timeGridDay", // will normally be on the right. if RTL, will be on the left
+              }}
+              height={"90vh"}
+              
+            />
+          </div>
         </>
       )}
       {!isCalendarView && (

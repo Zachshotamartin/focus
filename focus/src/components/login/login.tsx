@@ -2,7 +2,7 @@ import styles from "./login.module.css";
 
 const Login = () => {
   const handleLogin = () => {
-    window.location.href = "https://focus-447201.wl.r.appspot.com/login"; // Redirect to backend for OAuth
+    window.location.href = "http://localhost:8080/login"; // Redirect to backend for OAuth
   };
 
   return (

@@ -40,7 +40,7 @@ const LeftBar = ({
       if (token) {
         try {
           const response = await fetch(
-            `https://focus-447201.wl.r.appspot.com/calendar/event/${selectedEvent.id}`,
+            `http://localhost:8080/calendar/event/${selectedEvent.id}`,
             {
               method: "DELETE",
               headers: {
@@ -178,6 +178,8 @@ const LeftBar = ({
       estimatedDuration: 0,
       deadline: "",
     });
+
+    
   };
 
   const handleTestAdd = async () => {

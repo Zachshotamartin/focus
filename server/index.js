@@ -25,7 +25,7 @@ app.use(express.json());
 
 // CORS Configuration
 const corsOptions = {
-  origin: "https://focus-frontend-447706.wl.r.appspot.com", // Allow requests from your frontend
+  origin: "http://localhost:5173", // Allow requests from your frontend
   methods: ["GET", "POST", "OPTIONS", "DELETE"], // Add DELETE to allowed methods
   credentials: true, // Allow cookies and authorization headers
 };
@@ -69,7 +69,7 @@ app.get("/oauth/callback", async (req, res) => {
     console.log("User Info:", userInfo);
     // Redirect back to the frontend with the token
     res.redirect(
-      `https://focus-frontend-447706.wl.r.appspot.com/auth?token=${accessToken}&userInfo=${JSON.stringify(
+      `http://localhost:5173/auth?token=${accessToken}&userInfo=${JSON.stringify(
         userInfo
       )}`
     );
@@ -286,6 +286,37 @@ app.post("/schedule/ai-suggest", async (req, res) => {
     console.error("Error with AI scheduling suggestion:", error.message);
     res.status(500).send({
       error: "Failed to generate AI scheduling suggestion",
+      details: error.message,
+    });
+  }
+});
+
+app.post("/task/ai-suggest", async (req, res) => {
+  const { history, askGPTInput, title } = req.body;
+  const prompt = `You are a task assistant. The user is attempting to focus on ${title}. Your job is to be able to provide constructive advice for the user. Your responses should be short and direct. The prior question and answer history may be provided if available. Here is the current question: ${askGPTInput}`;
+  console.log(history, askGPTInput, title);
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        ...history
+          .map(([question, answer]) => [
+            { role: "user", content: question },
+            { role: "assistant", content: answer },
+          ])
+          .flat(),
+        { role: "user", content: prompt },
+      ],
+    });
+
+    const suggestion = response.choices[0].message.content.trim();
+
+    // Send the full response back to the frontend
+    res.status(200).send({ success: true, suggestion });
+  } catch (error) {
+    console.error("Error with AI suggestion:", error.message);
+    res.status(500).send({
+      error: "Failed to generate AI suggestion",
       details: error.message,
     });
   }
