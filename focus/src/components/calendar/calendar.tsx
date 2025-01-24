@@ -3,7 +3,8 @@ import Fullcalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-
+import rrulePlugin from "@fullcalendar/rrule"; // RRule plugin
+import { RRule } from "rrule";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styles from "./calendar.module.css";
@@ -22,36 +23,44 @@ import { setAllTasks } from "../../reducers/pageStateSlice";
 function GoogleCalendar() {
   const dispatch = useDispatch();
   const userData = JSON.parse(localStorage.getItem("user_info") || "{}");
-  console.log("userData", userData);
-  const [events, setEvents] = useState<any[]>([]); // Use proper typing here for events
+  const [events, setEvents] = useState<any[]>([]);
   const [naturalLanguageInput, setNaturalLanguageInput] = useState("");
 
   const calendarEvents = useSelector((state: any) => state.events.events);
   const isCalendarView = useSelector(
     (state: any) => state.pageState.isCalendarView
   );
-
   const allTasks = useSelector((state: any) => state.pageState.allTasks);
   const [showAllTasks, setShowAllTasks] = useState(allTasks);
   const tasks = useSelector((state: any) => state.events.tasks);
   const [viewTasks, setViewTasks] = useState<any[]>(tasks);
+  function parseRRule(rruleString: string) {
+    const rrule = RRule.fromString(rruleString); // Parse the RRule string into an RRule object
+    const daysOfWeek = rrule.options.byweekday;
+
+    daysOfWeek.forEach((day: any, index: number) => {
+      if (day === 6) {
+        daysOfWeek[index] = 0;
+      } else {
+        daysOfWeek[index] = day + 1;
+      }
+    });
+
+    return daysOfWeek;
+  }
+  function extractTime(dateTime: string | number | Date) {
+    const date = new Date(dateTime);
+    return date.toLocaleTimeString("en-GB", { hour12: false }); // 24-hour format
+  }
 
   useEffect(() => {
-    console.log("calendarEvents", calendarEvents);
-    console.log("tasks", tasks);
-    // Map events for display
-    const newEvents = calendarEvents.map((event: any) => ({
-      id: event.id,
-      title: event.title,
-      start: new Date(event.start),
-      end: new Date(event.end),
-      allDay: event.allDay,
-    }));
-    setEvents(newEvents);
-  }, [calendarEvents, tasks]);
+    const formattedEvents = calendarEvents;
+    console.log("formattedEvents", formattedEvents);
+    setEvents(formattedEvents);
+    console.log("events updated");
+  }, [calendarEvents]);
 
   useEffect(() => {
-    console.log("tasks", tasks);
     setViewTasks(tasks);
   }, [tasks]);
 
@@ -70,27 +79,53 @@ function GoogleCalendar() {
           );
           const data = await response.json();
           console.log("data", data.items);
-          if (data.items) {
-            // Map the events to the format required by react-big-calendar
-            const mappedEvents = data.items.map((event: any) => ({
-              id: event.id,
-              title: event.summary,
-              start: event.start.dateTime || event.start.date, // Keep as a string
-              end: event.end.dateTime || event.end.date,
-              allDay: !event.start.dateTime,
-              description: event.description,
 
-              extendedProperties: event.extendedProperties,
-            }));
-            console.log("repeats", mappedEvents);
+          if (data.items) {
+            // Map events
+            const mappedEvents = data.items.map((event: any) => {
+              // Parse RRule if present
+              const rrule = event.recurrence ? event.recurrence[0] : null;
+              let recurringProps = {};
+
+              // Transform RRule or other recurrence information
+              if (rrule) {
+                const daysOfWeek = parseRRule(rrule); // Helper function to parse RRule
+                const startTime = event.start.dateTime
+                  ? extractTime(event.start.dateTime)
+                  : extractTime(event.start.date);
+                const endTime = event.end.dateTime
+                  ? extractTime(event.end.dateTime)
+                  : extractTime(event.end.date);
+                recurringProps = {
+                  daysOfWeek: daysOfWeek, // [0, 1, ...] for days of the week
+                  startTime: startTime, // HH:mm:ss or similar
+                  endTime: endTime, // HH:mm:ss or similar
+
+                  groupId: event.id, // Optional: group events with the same ID
+                };
+              }
+
+              return {
+                id: event.id,
+                title: event.summary,
+                start: event.start.dateTime || event.start.date, // One-time events
+                end: event.end.dateTime || event.end.date,
+                allDay: !event.start.dateTime,
+                description: event.description,
+                extendedProperties: event.extendedProperties,
+                ...recurringProps, // Merge recurring event properties if present
+              };
+            });
+
             dispatch(setCalendarEvents(mappedEvents));
+
+            // Filter tasks with specific extended properties
             const newTasks = mappedEvents.filter(
               (event: any) =>
                 event.extendedProperties?.private?.deadline &&
                 event.extendedProperties?.private?.estimatedDuration
             );
 
-            // Format tasks for the store
             const finalTasks = newTasks.map((task: any) => ({
               id: task.id,
               title: task.title,
@@ -109,10 +144,8 @@ function GoogleCalendar() {
     };
 
     fetchCalendarEvents();
-  }, []); // Empty dependency array means this will run once when the component mounts
+  }, []); // Runs once on component mount
 
-  // Handle event selection
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSelect = ({ start, end }: any) => {
     const title = window.prompt("New Event name");
     if (title) {
@@ -128,7 +161,13 @@ function GoogleCalendar() {
     }
   };
 
+  const handleEventClick = ({ event }: any) => {
+    dispatch(setSelectedEvent(event));
+    console.log(event.id);
+  };
+
   const handleQuickAdd = async () => {
+    setNaturalLanguageInput(""); // Clear the input
     if (!naturalLanguageInput.trim()) {
       alert("Please enter a natural language event description.");
       return;
@@ -164,7 +203,6 @@ function GoogleCalendar() {
       const data = await response.json();
       console.log("Quick add response:", data);
 
-      // Add the new event to your events state
       setEvents((prevEvents) => [
         ...prevEvents,
         {
@@ -175,8 +213,6 @@ function GoogleCalendar() {
           allDay: !data.event.start.dateTime,
         },
       ]);
-
-      setNaturalLanguageInput(""); // Clear the input
     } catch (error) {
       console.error("Error adding quick add event:", error);
       alert("Failed to add event.");
@@ -219,21 +255,24 @@ function GoogleCalendar() {
           </div>
           <div style={{ width: "100%" }}>
             <Fullcalendar
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView={"dayGridMonth"}
-              events={events}
+              plugins={[
+                dayGridPlugin,
+                timeGridPlugin,
+                interactionPlugin,
+                rrulePlugin,
+              ]}
+              initialView="dayGridMonth"
+              events={events} // Your transformed events
               selectable={true}
               select={handleSelect}
-              selectMirror={true}
-              
-              handleWindowResize={true}
+              eventClick={handleEventClick}
               headerToolbar={{
-                start: "today prev,next", // will normally be on the left. if RTL, will be on the right
+                start: "today prev,next",
                 center: "title",
-                end: "dayGridMonth,timeGridWeek,timeGridDay", // will normally be on the right. if RTL, will be on the left
+                end: "dayGridMonth,timeGridWeek,timeGridDay",
               }}
-              height={"90vh"}
-              
+              height="90vh"
+              timeZone="local"
             />
           </div>
         </>
@@ -244,18 +283,26 @@ function GoogleCalendar() {
             <div className={styles.tasksContainer}>
               <div className={styles.topRow}>
                 <div className={styles.IsCalendarViewButtonContainer}>
-                  <button onClick={() => dispatch(setAllTasks(true))}>
+                  <button
+                    className={showAllTasks ? styles.selected : ""}
+                    onClick={() => dispatch(setAllTasks(true))}
+                  >
                     {" "}
                     View all tasks
                   </button>
                   <button
+                    className={!showAllTasks ? styles.selected : ""}
                     onClick={() => {
+                      console.log("allTasks", showAllTasks);
+                      if (!showAllTasks) {
+                        return;
+                      }
                       dispatch(setSelectedEvent(tasks[0]));
                       dispatch(setAllTasks(false));
                     }}
                   >
                     {" "}
-                    Swipe{" "}
+                    Focus Mode{" "}
                   </button>
                 </div>
                 <div className={styles.profileContainer}>

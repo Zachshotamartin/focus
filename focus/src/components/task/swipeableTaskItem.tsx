@@ -1,23 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./swipeableTaskItem.module.css";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { updateGPTConversation } from "../../reducers/eventsSlice";
 const SwipeableTaskItem = (props: any) => {
+  const dispatch = useDispatch();
   const task = useSelector((state: any) => state.events.selectedEvent);
+  const taskGPTConversation = useSelector(
+    (state: any) => state.events.taskGPTConversation
+  );
   const handleNext = props.handleNext;
   const handleDelete = props.handleDelete;
   const [askGPTInput, setAskGPTInput] = useState("");
-  const [history, setHistory] = useState<string[][]>([]);
+  const [history, setHistory] = useState<
+    { id: string; conversation: string[][] }[]
+  >([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    console.log(taskGPTConversation);
+    setHistory(
+      taskGPTConversation.filter(
+        (curTask: { id: any }) => curTask.id === task.id
+      )
+    );
+  }, [taskGPTConversation, task]);
+
   const handleAskGPT = async (title: string) => {
     try {
-      const currentResponseIndex = history.length;
+      const lastResponseIndex = history[0]?.conversation?.length - 1;
       const response = await fetch("http://localhost:8080/task/ai-suggest", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ history, askGPTInput, title }),
+        body: JSON.stringify({
+          history: history[0]?.conversation,
+          askGPTInput,
+          title,
+        }),
       });
 
       if (!response.ok) {
@@ -55,16 +76,18 @@ const SwipeableTaskItem = (props: any) => {
             // Simulate typing by updating the suggestion one character at a time
             for (let i = 0; i < suggestion.length; i++) {
               // const character = suggestion[i];
-              await delay(25); // Adjust delay for typing speed (e.g., 50ms per character)
+              await delay(10); // Adjust delay for typing speed (e.g., 50ms per character)
 
               // Update the UI with the current portion of the suggestion
-              setHistory((prevHistory) => [
-                ...prevHistory.filter(
-                  (_questionAnswer: string[], index: number) =>
-                    index !== currentResponseIndex
-                ),
-                [askGPTInput, suggestion.slice(0, i + 1)], // Display progressively more of the suggestion
-              ]);
+              dispatch(
+                updateGPTConversation({
+                  taskId: task.id,
+                  message: [
+                    ...history[0].conversation.slice(0, lastResponseIndex + 1),
+                    [askGPTInput, suggestion.slice(0, i + 1)],
+                  ],
+                })
+              );
             }
             break; // Exit the loop after fully displaying the suggestion
           }
@@ -90,19 +113,34 @@ const SwipeableTaskItem = (props: any) => {
     <div className={styles.taskContainer}>
       <div className={styles.infoContainer}>
         <h3 className={styles.taskTitle}>{title}</h3>
-        <p className={styles.taskDeadline}>Deadline: {deadline}</p>
+        Deadline:{" "}
+        {new Date(deadline).toLocaleString("en-US", {
+          weekday: "long", // "Monday"
+          year: "numeric", // "2025"
+          month: "long", // "January"
+          day: "numeric", // "24"
+          hour: "2-digit", // "08"
+          minute: "2-digit", // "46"
+          hour12: true, // "AM/PM"
+        })}
         <p className={styles.taskEstimatedDuration}>
-          Estimated Duration: {estimatedDuration}
+          Estimated Duration: {estimatedDuration} hours
         </p>
-
         <div className={styles.buttonContainer}>
           <button onClick={handleNext}>Next Task</button>
-          <button onClick={handleDelete}>Completed Task</button>
+          <button
+            onClick={() => {
+              handleDelete();
+              console.log("task deleted");
+            }}
+          >
+            Completed Task
+          </button>
         </div>
       </div>
       <div className={styles.askGPTContainer}>
         <div className={styles.askGPTResponse}>
-          {history.map((line, index) => (
+          {history[0]?.conversation.map((line, index) => (
             <div key={index}>
               <p className={styles.askGPTQuestion}>{line[0]}</p>
               <p className={styles.askGPTAnswer}>{line[1]}</p>

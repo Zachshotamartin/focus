@@ -30,6 +30,7 @@ const SwipeableList = () => {
   }, [tasks]);
 
   const handleDelete = async () => {
+    console.log("viewTasks[shownTaskIndex]", viewTasks[shownTaskIndex]);
     if (viewTasks[shownTaskIndex]) {
       const token = localStorage.getItem("user_token");
       console.log("Token:", token);
@@ -49,11 +50,18 @@ const SwipeableList = () => {
           if (response.ok) {
             console.log("Event deleted successfully");
             dispatch(removeTask(viewTasks[shownTaskIndex]));
-            dispatch(setSelectedEvent(tasks(viewTasks[shownTaskIndex])));
-            dispatch(removeCalendarEvent());
-            setShownTaskIndex((prev) =>
-              prev >= viewTasks.length - 1 ? 0 : prev
+            dispatch(removeCalendarEvent(viewTasks[shownTaskIndex]));
+            console.log("viewTasks, " + viewTasks);
+            if (viewTasks.length === 1) {
+              dispatch(setSelectedEvent(null));
+              setShownTaskIndex(-1);
+              return;
+            }
+            const nextTaskAfterDelete = viewTasks[shownTaskIndex + 1] || null;
+            setShownTaskIndex(
+              nextTaskAfterDelete ? viewTasks.indexOf(nextTaskAfterDelete) : 0
             );
+            dispatch(setSelectedEvent(nextTaskAfterDelete));
           } else {
             console.error("Failed to delete event");
           }
@@ -69,13 +77,18 @@ const SwipeableList = () => {
     while (randomIndex === shownTaskIndex) {
       randomIndex = Math.floor(Math.random() * viewTasks.length);
     }
+    if (viewTasks.length === 0) {
+      dispatch(setSelectedEvent(null));
+      setShownTaskIndex(0);
+      return;
+    }
     setShownTaskIndex(randomIndex);
     dispatch(setSelectedEvent(viewTasks[randomIndex]));
   };
 
   return (
     <div className={styles.container}>
-      {viewTasks.length > 0 ? (
+      {viewTasks.length > 0 || shownTaskIndex >= 0 ? (
         <SwipeableTaskItem
           task={selectedEvent ? viewTasks[0] : selectedEvent}
           handleNext={handleRandomNextTask}

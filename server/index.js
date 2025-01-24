@@ -293,7 +293,7 @@ app.post("/schedule/ai-suggest", async (req, res) => {
 
 app.post("/task/ai-suggest", async (req, res) => {
   const { history, askGPTInput, title } = req.body;
-  const prompt = `You are a task assistant. The user is attempting to focus on ${title}. Your job is to be able to provide constructive advice for the user. Your responses should be short and direct. The prior question and answer history may be provided if available. Here is the current question: ${askGPTInput}`;
+  const prompt = `You are a task assistant. The user is attempting to focus on ${title}. Your job is to be able to provide constructive advice for the user. Your responses should be short and direct. If the user seems to be getting off topic with their questions, try to get them back on topic. Do not take time answering questions that are not related to the topic of ${title}. The prior question and answer history may be provided if available. Here is the current question: ${askGPTInput}`;
   console.log(history, askGPTInput, title);
   try {
     const response = await openai.chat.completions.create({

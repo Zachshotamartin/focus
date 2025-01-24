@@ -8,6 +8,7 @@ export interface EventState {
   selectedEvent: any | null;
 
   tasks: any[];
+  taskGPTConversation: { id: string; conversation: string[][] }[];
   freebusy: any[];
   loading: boolean;
 }
@@ -16,6 +17,7 @@ const initialState: EventState = {
   events: [],
   selectedEvent: null,
   tasks: [],
+  taskGPTConversation: [],
   freebusy: [],
   loading: true,
 };
@@ -31,13 +33,14 @@ const eventsSlice = createSlice({
     addCalendarEvent: (state, action: PayloadAction<any>) => {
       state.events.push(action.payload);
     },
-    removeCalendarEvent: (state) => {
-      if (state.selectedEvent !== null) {
-        state.events = state.events.filter(
-          (event) => event.id !== state.selectedEvent.id
-        );
-      }
+    removeCalendarEvent: (state, action: PayloadAction<any>) => {
+      state.events = state.events.filter(
+        (event) => event.id !== action.payload.id
+      );
       state.selectedEvent = null;
+      console.log("event removed");
+      console.log("events", state.events);
+      console.log("action ,", action.payload);
     },
 
     setSelectedEvent: (state, action: PayloadAction<any>) => {
@@ -52,13 +55,33 @@ const eventsSlice = createSlice({
     setTasks: (state, action: PayloadAction<any[]>) => {
       state.tasks = action.payload;
       state.loading = false;
+      state.taskGPTConversation = state.tasks.map((task) => ({
+        id: task.id,
+        conversation: [],
+      }));
     },
     addTask: (state, action: PayloadAction<any>) => {
       state.tasks.push(action.payload);
+      state.taskGPTConversation.push({
+        id: action.payload.id,
+        conversation: [],
+      });
     },
 
     removeTask: (state, action: PayloadAction<any>) => {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload.id);
+      state.taskGPTConversation = state.taskGPTConversation.filter(
+        (task) => task.id !== action.payload.id
+      );
+    },
+    updateGPTConversation: (state, action: PayloadAction<any>) => {
+      const { taskId, message } = action.payload;
+      state.taskGPTConversation = state.taskGPTConversation.map((task) => {
+        if (task.id === taskId) {
+          return { ...task, conversation: message };
+        }
+        return task;
+      });
     },
     setFreeBusy: (state, action: PayloadAction<any[]>) => {
       state.freebusy = action.payload;
@@ -75,6 +98,7 @@ export const {
   addTask,
   removeTask,
   setFreeBusy,
+  updateGPTConversation,
 } = eventsSlice.actions;
 
 export default eventsSlice.reducer;

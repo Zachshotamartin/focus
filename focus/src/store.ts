@@ -1,11 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 import eventsSlice from "./reducers/eventsSlice";
 import pageStateSlice from "./reducers/pageStateSlice";
+
 const store = configureStore({
   reducer: {
     events: eventsSlice,
     pageState: pageStateSlice,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false, // Disable serializability check
+    }),
   preloadedState: {
     events: {
       events: [],

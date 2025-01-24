@@ -24,23 +24,27 @@ const LeftBar = ({
     deadline: "", // Added deadline field
   });
 
-
   const dispatch = useDispatch();
 
   const selectedEvent = useSelector((state: any) => state.events.selectedEvent);
-
+  const isCalendarView = useSelector(
+    (state: any) => state.pageState.isCalendarView
+  );
   const tasks = useSelector((state: any) => state.events.tasks);
   //const freeBusy = useSelector((state: any) => state.events.freebusy);
   const [autoSchedule, setAutoSchedule] = useState(false);
 
   const handleDelete = async () => {
+    console.log("selectedEvent", selectedEvent._def.publicId);
+    console.log("selectedEvent", selectedEvent);
+    const id = selectedEvent._def.publicId;
     if (selectedEvent) {
       const token = localStorage.getItem("user_token");
       console.log("Token:", token);
       if (token) {
         try {
           const response = await fetch(
-            `http://localhost:8080/calendar/event/${selectedEvent.id}`,
+            `http://localhost:8080/calendar/event/${id}`,
             {
               method: "DELETE",
               headers: {
@@ -53,7 +57,8 @@ const LeftBar = ({
           if (response.ok) {
             console.log("Event deleted successfully");
             dispatch(removeTask(selectedEvent));
-            dispatch(removeCalendarEvent());
+            dispatch(removeCalendarEvent(id));
+            console.log("event removed");
           } else {
             console.error("Failed to delete event");
           }
@@ -167,8 +172,17 @@ const LeftBar = ({
         },
       },
     };
+    if (
+      formattedEvent.extendedProperties.private.deadline &&
+      formattedEvent.extendedProperties.private.deadline <=
+        new Date().toISOString()
+    ) {
+      alert("Deadline is in the past. Please choose a future date.");
+      return;
+    }
 
     onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: freeBusy }); // Call the provided function
+    console.log(freeBusy);
     setEventDetails({
       summary: "",
       description: "",
@@ -178,8 +192,6 @@ const LeftBar = ({
       estimatedDuration: 0,
       deadline: "",
     });
-
-    
   };
 
   const handleTestAdd = async () => {
@@ -207,18 +219,35 @@ const LeftBar = ({
         <h1 className={styles.title}>Focus</h1>
       </div>
       <div className={styles.pageStateButtonContainer}>
-        <button onClick={() => dispatch(setIsCalendarView(true))}>
+        <button
+          className={isCalendarView ? styles.selected : ""}
+          onClick={() => dispatch(setIsCalendarView(true))}
+        >
           Calendar
         </button>
-        <button onClick={() => dispatch(setIsCalendarView(false))}>
+        <button
+          className={!isCalendarView ? styles.selected : ""}
+          onClick={() => dispatch(setIsCalendarView(false))}
+        >
           Tasks
         </button>
       </div>
-      <div className={styles.buttonContainer}>
-        <button onClick={() => setAutoSchedule(true)}>Auto</button>
-        <button onClick={() => setAutoSchedule(false)}>Manual</button>
-      </div>
+
       <h2>Create Event</h2>
+      <div className={styles.buttonContainer}>
+        <button
+          className={autoSchedule ? styles.selected : ""}
+          onClick={() => setAutoSchedule(true)}
+        >
+          Auto
+        </button>
+        <button
+          className={!autoSchedule ? styles.selected : ""}
+          onClick={() => setAutoSchedule(false)}
+        >
+          Manual
+        </button>
+      </div>
       {!autoSchedule && (
         <form onSubmit={handleSubmit} className={styles.form}>
           <div>

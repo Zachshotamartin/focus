@@ -132,3 +132,8 @@
     border-bottom: 1px solid #ddd;
   }
 }
+
+.selected {
+  background-color: #475569;
+  color: white;
+}
