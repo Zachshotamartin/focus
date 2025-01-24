@@ -41,7 +41,7 @@ app.get("/login", (req, res) => {
   const redirectUri = process.env.REDIRECT;
   const clientId = process.env.CLIENT_ID;
 
-  const loginUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid%20email%20https://www.googleapis.com/auth/calendar`;
+  const loginUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid%20email%20profile%20https://www.googleapis.com/auth/calendar`;
   res.redirect(loginUrl);
 });
 
@@ -264,8 +264,12 @@ app.post("/schedule/ai-suggest", async (req, res) => {
       }, Estimated duration is ${
       eventDetails.estimatedDuration
     } hour, and the deadline is ${eventDetails.deadline}.
-      
-      Ensure the suggested time fits within the free slots, accommodates the estimated duration, and is scheduled as early as possible before the deadline. Respond only with the suggested time, in the format "YYYY-MM-DDTHH:mm:ssZ" and only suggest a time that is divisible by 15 minutes (like 2023-08-01T09:00:00Z or 2023-08-01T09:15:00Z or 2023-08-01T09:30:00Z or 2023-08-01T09:45:00Z). Do not include any explanation or additional text.`;
+      The preferred time is ${eventDetails.preferences.beforeOrAfter} ${
+      eventDetails.preferences.timePreference
+    }. Here is some extra context to help you make your decision: ${
+      eventDetails.description || "No description provided"
+    }.
+      Ensure the suggested time fits within the free slots, accommodates the estimated duration, and is scheduled a reasonable time before the deadline if possible. Also do to schedule too late in the day unless specified. It is better to schedule an event the next day than schedule it too late. Try not to schedule an event too close to the current time unless the deadline is near. Be sure to schedule the time accordingly to the event name (like "cooking dinner should not be scheduled in the morning"). Schedule the date accordingly as well (If the event seems like a daily activity, schedule it on the same or next day). BE SMART WITH YOUR PLANNING. Respond only with the suggested time, in the format "YYYY-MM-DDTHH:mm:ssZ" and only suggest a time that is divisible by 15 minutes (like 2023-08-01T09:00:00Z or 2023-08-01T09:15:00Z or 2023-08-01T09:30:00Z or 2023-08-01T09:45:00Z). Do not include any explanation or additional text.`;
     console.log("prompt", prompt);
     // Call OpenAI API
     const response = await openai.chat.completions.create({
