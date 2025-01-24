@@ -10,6 +10,7 @@ const AuthCallback = () => {
       const token = urlParams.get("token");
       const userInfo = urlParams.get("userInfo");
       console.log("userInfo", userInfo);
+
       if (token) {
         // Save the token in localStorage for later use
         localStorage.setItem("user_token", token);

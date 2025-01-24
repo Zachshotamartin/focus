@@ -60,6 +60,9 @@
   border-color: white;
   background-color: #2b2b2b;
 }
+.form input {
+  height: 100%;
+}
 
 .form input:focus,
 .form textarea:focus {
@@ -72,6 +75,26 @@
 .form textarea {
   resize: vertical;
   height: 80px;
+}
+
+.form select {
+  flex: 1;
+  height: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: white;
+  border-color: white;
+  background-color: #2b2b2b;
+  margin-bottom: 1rem;
+}
+
+
+.form select:focus {
+  outline: none;
+  border-color: #475569;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.25);
 }
 
 /* Button Styling */
@@ -104,6 +127,7 @@
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
+  gap: 1rem;
 }
 
 .logo {
@@ -118,6 +142,7 @@
   flex-direction: row;
   width: 100%;
   margin-bottom: 1rem;
+  gap: 1rem;
 }
 
 .buttonBottom {

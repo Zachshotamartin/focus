@@ -11,6 +11,7 @@ import styles from "./calendar.module.css";
 import Task from "../task/task";
 import SwipeableList from "../swipeableList/swipeableList";
 import Logout from "../logout/logout";
+import Settings from "../settings/settings";
 
 import {
   setCalendarEvents,
@@ -25,6 +26,7 @@ function GoogleCalendar() {
   const userData = JSON.parse(localStorage.getItem("user_info") || "{}");
   const [events, setEvents] = useState<any[]>([]);
   const [naturalLanguageInput, setNaturalLanguageInput] = useState("");
+  const [userSettingsOpen, setUserSettingsOpen] = useState(false);
 
   const calendarEvents = useSelector((state: any) => state.events.events);
   const isCalendarView = useSelector(
@@ -52,6 +54,25 @@ function GoogleCalendar() {
     const date = new Date(dateTime);
     return date.toLocaleTimeString("en-GB", { hour12: false }); // 24-hour format
   }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        event.target &&
+        !(event.target as Element).closest("#userSettings") &&
+        !(event.target as Element).closest("#profileImage")
+      ) {
+        setUserSettingsOpen(false);
+        console.log("hello");
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const formattedEvents = calendarEvents;
@@ -241,17 +262,39 @@ function GoogleCalendar() {
                   {userData.picture && (
                     <img
                       src={userData.picture}
+                      id="profileImage"
                       alt="User Profile"
                       className={styles.profileImage}
+                      onClick={() => setUserSettingsOpen(!userSettingsOpen)}
                     />
                   )}
-                  <p className={styles.email}>{userData.email}</p>
-                  <Logout />
                 </>
               ) : (
                 <p>Loading user information...</p>
               )}
             </div>
+            {userSettingsOpen && (
+              <div className={styles.userSettings} id="userSettings">
+                {userData && userData.email && (
+                  <p className={styles.email}>{userData.email}</p>
+                )}
+
+                {userData.picture && (
+                  <img
+                    src={userData.picture}
+                    alt="User Profile"
+                    className={styles.settingsPicture}
+                  />
+                )}
+                {userData.name && (
+                  <p className={styles.name}>Hi, {userData.name}!</p>
+                )}
+                <div className={styles.options}>
+                  <Settings />
+                  <Logout />
+                </div>
+              </div>
+            )}
           </div>
           <div style={{ width: "100%" }}>
             <Fullcalendar

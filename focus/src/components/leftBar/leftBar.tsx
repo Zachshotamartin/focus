@@ -22,6 +22,8 @@ const LeftBar = ({
     timeZone: "America/Los_Angeles",
     estimatedDuration: 0, // Added estimatedDuration field
     deadline: "", // Added deadline field
+    beforeOrAfter: "before",
+    timePreference: "12:00 AM",
   });
 
   const dispatch = useDispatch();
@@ -78,6 +80,13 @@ const LeftBar = ({
       [name]: name === "estimatedDuration" ? parseFloat(value) : value, // Parse duration as float
     }));
   };
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setEventDetails((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,12 +102,6 @@ const LeftBar = ({
         dateTime: new Date(eventDetails.end).toISOString(),
         timeZone: eventDetails.timeZone,
       },
-      // extendedProperties: {
-      //   private: {
-      //     estimatedDuration: eventDetails.estimatedDuration, // Include estimated duration
-      //     deadline: eventDetails.deadline || null, // Include deadline if provided
-      //   },
-      // },
     };
 
     onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: [] }); // Call the provided function
@@ -110,6 +113,8 @@ const LeftBar = ({
       timeZone: "America/Los_Angeles",
       estimatedDuration: 0,
       deadline: "",
+      beforeOrAfter: "before",
+      timePreference: "12:00 AM",
     });
   };
   const handleFetchFreeBusy = async () => {
@@ -171,6 +176,10 @@ const LeftBar = ({
           deadline: eventDetails.deadline || null, // Include deadline if provided
         },
       },
+      preferences: {
+        beforeOrAfter: eventDetails.beforeOrAfter,
+        timePreference: eventDetails.timePreference,
+      },
     };
     if (
       formattedEvent.extendedProperties.private.deadline &&
@@ -180,6 +189,7 @@ const LeftBar = ({
       alert("Deadline is in the past. Please choose a future date.");
       return;
     }
+    console.log("format", formattedEvent);
 
     onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: freeBusy }); // Call the provided function
     console.log(freeBusy);
@@ -191,6 +201,8 @@ const LeftBar = ({
       timeZone: "America/Los_Angeles",
       estimatedDuration: 0,
       deadline: "",
+      beforeOrAfter: "before",
+      timePreference: "12:00 AM",
     });
   };
 
@@ -319,7 +331,29 @@ const LeftBar = ({
               onChange={handleChange}
             />
           </div>
+          <div>
+            <label htmlFor="timePreference">Time Preference:</label>
+            <div style={{ display: "flex", flexDirection: "row", gap: "1rem" }}>
+              <select
+                id="beforeOrAfter"
+                name="beforeOrAfter"
+                value={eventDetails.beforeOrAfter}
+                onChange={handleSelectChange}
+              >
+                <option value="before">Before</option>
+                <option value="after">After</option>
+              </select>
 
+              <input
+                type="time"
+                id="timePreference"
+                name="timePreference"
+                value={eventDetails.timePreference}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
           <div>
             <label htmlFor="estimatedDuration">
               Estimated Duration (hours):
@@ -332,6 +366,7 @@ const LeftBar = ({
               onChange={handleChange}
               step="0.1"
               min="0"
+              required
             />
           </div>
           <div>
@@ -342,6 +377,7 @@ const LeftBar = ({
               name="deadline"
               value={eventDetails.deadline}
               onChange={handleChange}
+              required
             />
           </div>
           <button className={styles.button} type="submit">

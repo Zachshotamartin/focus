@@ -96,8 +96,11 @@ const MainPage = () => {
     );
     console.log("suggestedTime", suggestedTime);
     if (suggestedTime) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { preferences, ...details } = eventDetails;
+      console.log("details", details);
       return {
-        ...eventDetails,
+        ...details,
         start: {
           dateTime: new Date(suggestedTime).toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
