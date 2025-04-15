@@ -112,31 +112,98 @@ app.get("/calendar", async (req, res) => {
 
 app.post("/calendar/event", async (req, res) => {
   const { eventDetails } = req.body;
-  const token = req.headers.authorization;
-  console.log("token", token);
-  console.log("eventDetails", eventDetails);
+  // Extract just the token from the authorization header
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.substring(7) // Remove "Bearer " prefix
+    : authHeader;
+
+  console.log("Authorization header:", authHeader);
+  console.log(
+    "Token (after extraction):",
+    token ? `${token.substring(0, 10)}...` : "No token"
+  );
+  console.log(
+    "eventDetails:",
+    JSON.stringify(eventDetails, null, 2).substring(0, 200) + "..."
+  );
+
   if (!token || !eventDetails) {
-    return res.status(400).send("Missing token or event details");
+    return res.status(400).send({
+      error: "Missing token or event details",
+      details:
+        "Request must include both authorization token and event details",
+    });
   }
 
   try {
+    // Validate required fields
+    if (!eventDetails.summary) {
+      return res.status(400).send({
+        error: "Missing required field",
+        details: "Event summary (title) is required",
+      });
+    }
+
+    if (
+      !eventDetails.start ||
+      (!eventDetails.start.dateTime && !eventDetails.start.date)
+    ) {
+      return res.status(400).send({
+        error: "Missing required field",
+        details: "Event start time is required (either dateTime or date)",
+      });
+    }
+
+    if (
+      !eventDetails.end ||
+      (!eventDetails.end.dateTime && !eventDetails.end.date)
+    ) {
+      return res.status(400).send({
+        error: "Missing required field",
+        details: "Event end time is required (either dateTime or date)",
+      });
+    }
+
+    console.log(
+      "Sending to Google Calendar API:",
+      JSON.stringify(eventDetails, null, 2)
+    );
+
     const response = await axios.post(
       "https://www.googleapis.com/calendar/v3/calendars/primary/events",
       eventDetails,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Now token is properly extracted
           "Content-Type": "application/json",
         },
       }
     );
-    console.log("response", response.data);
+    console.log("Google API response:", response.data);
     res.status(200).send({ success: true, event: response.data });
   } catch (error) {
     console.error("Error adding event:", error.response?.data || error.message);
-    res.status(500).send({
+    console.error("Request details:", JSON.stringify(eventDetails, null, 2));
+
+    // Provide more detailed error information
+    let errorDetails = "Unknown error occurred";
+    if (error.response) {
+      console.error("Error response status:", error.response.status);
+      console.error(
+        "Error response data:",
+        JSON.stringify(error.response.data, null, 2)
+      );
+      errorDetails =
+        error.response.data.error?.message ||
+        JSON.stringify(error.response.data);
+    } else if (error.message) {
+      errorDetails = error.message;
+    }
+
+    res.status(error.response?.status || 500).send({
       error: "Failed to add event",
-      details: error.response?.data || error.message,
+      details: errorDetails,
     });
   }
 });

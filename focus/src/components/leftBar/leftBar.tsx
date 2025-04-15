@@ -9,6 +9,7 @@ import {
 } from "../../reducers/eventsSlice";
 import { setIsCalendarView } from "../../reducers/pageStateSlice";
 import logo from "../../assets/logo.png";
+import { FaMapMarkerAlt, FaUsers, FaLink } from "react-icons/fa";
 
 const LeftBar = ({
   onSubmitEvent,
@@ -26,6 +27,9 @@ const LeftBar = ({
     deadline: "",
     beforeOrAfter: "before",
     timePreference: "12:00 AM",
+    location: "",
+    guests: "",
+    webLink: "",
   });
 
   // State for resizable left bar
@@ -133,6 +137,11 @@ const LeftBar = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Parse guests from comma-separated string to array of objects
+    const guestsList = eventDetails.guests
+      ? eventDetails.guests.split(',').map(email => ({ email: email.trim() }))
+      : [];
+
     const formattedEvent = {
       summary: eventDetails.summary,
       description: eventDetails.description,
@@ -155,6 +164,10 @@ const LeftBar = ({
               timeZone: eventDetails.timeZone,
             },
           }),
+      // Add new fields if they are provided
+      ...(eventDetails.location && { location: eventDetails.location }),
+      ...(guestsList.length > 0 && { attendees: guestsList }),
+      ...(eventDetails.webLink && { source: { url: eventDetails.webLink } }),
     };
 
     onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: [] });
@@ -208,6 +221,12 @@ const LeftBar = ({
   const handleAutoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const freeBusy = await handleFetchFreeBusy();
+    
+    // Parse guests from comma-separated string to array of objects
+    const guestsList = eventDetails.guests
+      ? eventDetails.guests.split(',').map(email => ({ email: email.trim() }))
+      : [];
+      
     const formattedEvent = {
       summary: eventDetails.summary,
       description: eventDetails.description,
@@ -221,6 +240,10 @@ const LeftBar = ({
         beforeOrAfter: eventDetails.beforeOrAfter,
         timePreference: eventDetails.timePreference,
       },
+      // Add new fields if they are provided
+      ...(eventDetails.location && { location: eventDetails.location }),
+      ...(guestsList.length > 0 && { attendees: guestsList }),
+      ...(eventDetails.webLink && { source: { url: eventDetails.webLink } }),
     };
 
     if (
@@ -248,6 +271,9 @@ const LeftBar = ({
       deadline: "",
       beforeOrAfter: "before",
       timePreference: "12:00 AM",
+      location: "",
+      guests: "",
+      webLink: "",
     });
   };
 
@@ -323,7 +349,7 @@ const LeftBar = ({
       {/* Form Sections */}
       {!autoSchedule && (
         <form onSubmit={handleSubmit} className={styles.form}>
-          <div>
+          <div className={styles.formGroup}>
             <label htmlFor="summary">Event Title:</label>
             <input
               type="text"
@@ -336,7 +362,7 @@ const LeftBar = ({
             />
           </div>
 
-          <div>
+          <div className={styles.formGroup}>
             <label htmlFor="description">Description:</label>
             <textarea
               id="description"
@@ -346,6 +372,9 @@ const LeftBar = ({
               placeholder="Enter event details"
             />
           </div>
+
+          <div className={styles.formDivider} />
+          <h3>Time & Date</h3>
 
           <div className={styles.checkboxContainer}>
             <label className={styles.checkboxLabel} htmlFor="allDay">
@@ -365,7 +394,7 @@ const LeftBar = ({
             />
           </div>
 
-          <div>
+          <div className={styles.formGroup}>
             <label htmlFor="start">
               {eventDetails.allDay ? "Start Date:" : "Start Time:"}
             </label>
@@ -379,7 +408,7 @@ const LeftBar = ({
             />
           </div>
 
-          <div>
+          <div className={styles.formGroup}>
             <label htmlFor="end">
               {eventDetails.allDay ? "End Date:" : "End Time:"}
             </label>
@@ -393,6 +422,54 @@ const LeftBar = ({
             />
           </div>
 
+          <div className={styles.formDivider} />
+          <h3>Event Details</h3>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="location">
+              <FaMapMarkerAlt className={styles.formIcon} /> Location:
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={eventDetails.location}
+              onChange={handleChange}
+              placeholder="Add a location"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="guests">
+              <FaUsers className={styles.formIcon} /> Guests:
+            </label>
+            <input
+              type="text"
+              id="guests"
+              name="guests"
+              value={eventDetails.guests}
+              onChange={handleChange}
+              placeholder="Add emails (comma-separated)"
+            />
+            <small className={styles.helperText}>
+              Enter email addresses separated by commas
+            </small>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="webLink">
+              <FaLink className={styles.formIcon} /> Web Link:
+            </label>
+            <input
+              type="url"
+              id="webLink"
+              name="webLink"
+              value={eventDetails.webLink}
+              onChange={handleChange}
+              placeholder="Add a relevant URL"
+            />
+          </div>
+
           <button className={styles.button} type="submit">
             Add Event
           </button>
@@ -401,7 +478,7 @@ const LeftBar = ({
 
       {autoSchedule && (
         <form onSubmit={handleAutoSubmit} className={styles.form}>
-          <div>
+          <div className={styles.formGroup}>
             <label htmlFor="summary">Event Title:</label>
             <input
               type="text"
@@ -414,7 +491,7 @@ const LeftBar = ({
             />
           </div>
 
-          <div>
+          <div className={styles.formGroup}>
             <label htmlFor="description">Description:</label>
             <textarea
               id="description"
@@ -425,7 +502,10 @@ const LeftBar = ({
             />
           </div>
 
-          <div>
+          <div className={styles.formDivider} />
+          <h3>Scheduling Preferences</h3>
+
+          <div className={styles.formGroup}>
             <label htmlFor="timePreference">Time Preference:</label>
             <div
               style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}
@@ -451,7 +531,7 @@ const LeftBar = ({
             </div>
           </div>
 
-          <div>
+          <div className={styles.formGroup}>
             <label htmlFor="estimatedDuration">
               Estimated Duration (hours):
             </label>
@@ -468,7 +548,7 @@ const LeftBar = ({
             />
           </div>
 
-          <div>
+          <div className={styles.formGroup}>
             <label htmlFor="deadline">Deadline:</label>
             <input
               type="datetime-local"
@@ -477,6 +557,54 @@ const LeftBar = ({
               value={eventDetails.deadline}
               onChange={handleChange}
               required
+            />
+          </div>
+
+          <div className={styles.formDivider} />
+          <h3>Event Details</h3>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="location">
+              <FaMapMarkerAlt className={styles.formIcon} /> Location:
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={eventDetails.location}
+              onChange={handleChange}
+              placeholder="Add a location"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="guests">
+              <FaUsers className={styles.formIcon} /> Guests:
+            </label>
+            <input
+              type="text"
+              id="guests"
+              name="guests"
+              value={eventDetails.guests}
+              onChange={handleChange}
+              placeholder="Add emails (comma-separated)"
+            />
+            <small className={styles.helperText}>
+              Enter email addresses separated by commas
+            </small>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="webLink">
+              <FaLink className={styles.formIcon} /> Web Link:
+            </label>
+            <input
+              type="url"
+              id="webLink"
+              name="webLink"
+              value={eventDetails.webLink}
+              onChange={handleChange}
+              placeholder="Add a relevant URL"
             />
           </div>
 

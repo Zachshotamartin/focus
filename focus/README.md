@@ -1,50 +1,100 @@
-# React + TypeScript + Vite
+# Focus
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A smart calendar and task management application designed to enhance productivity through intelligent scheduling and focused task management.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Focus combines powerful calendar management with intelligent task scheduling to help users optimize their time. The application integrates with Google Calendar to provide a seamless experience for managing events, tasks, and appointments.
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Smart Auto-Scheduling**: Automatically schedules events and tasks based on your availability and preferences
+- **Natural Language Input**: Add events using plain English (e.g., "Meeting with John tomorrow at 3pm")
+- **Task Management**: Create, track, and complete tasks with priority settings
+- **Theme Support**: Light, dark, and system theme options for comfortable usage in any environment
+- **Google Calendar Integration**: Sync with your existing Google Calendar events
+- **Responsive Design**: Works on desktop and mobile devices
 
-- Configure the top-level `parserOptions` property like this:
+## Technologies Used
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- React
+- TypeScript
+- Redux for state management
+- Google Calendar API
+- CSS Modules for styling
+- React Icons
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or later)
+- npm or yarn
+- Google account for Calendar integration
+
+### Installation
+
+1. Clone the repository:
+
+   ```
+   git clone https://github.com/yourusername/focus.git
+   cd focus
+   ```
+
+2. Install dependencies:
+
+   ```
+   npm install
+   ```
+
+3. Create a `.env` file in the root directory with your Google API credentials:
+
+   ```
+   REACT_APP_GOOGLE_CLIENT_ID=your-client-id
+   REACT_APP_GOOGLE_API_KEY=your-api-key
+   ```
+
+4. Start the development server:
+   ```
+   npm start
+   ```
+
+### Building for Production
+
+```
+npm run build
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Usage
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+1. Sign in with your Google account to allow Focus to access your calendar
+2. Use the left sidebar to create new events or tasks
+3. Use natural language input for quick event creation
+4. Toggle between calendar and task views as needed
+5. Adjust settings like theme and notifications via the settings panel
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Privacy
+
+Focus is designed with privacy in mind. The application:
+
+- Does not store your personal information on servers
+- Processes data locally on your device
+- Only accesses the Google Calendar information necessary for functionality
+- Does not track usage or collect analytics
+
+For more details, see our [Privacy Policy](src/pages/privacyPolicy/privacyPolicy.tsx).
+
+## Future Features
+
+- Enhanced natural language processing
+- Time tracking and analytics
+- Integrated pomodoro timer
+- Team collaboration features
+
+## Contact
+
+For questions or feedback, please contact zachsm999@gmail.com
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -434,3 +434,44 @@ input:checked + .slider:before {
   background-color: var(--color-danger);
   color: white;
 }
+
+.durationContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.durationContainer label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.durationInput {
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: white;
+  width: 100%;
+}
+
+.durationInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.addButton {
+  color: white;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.addButton:hover {
+  background-color: var(--color-primary-hover);
+}

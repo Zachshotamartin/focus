@@ -430,7 +430,7 @@ function GoogleCalendar() {
   };
 
   const handleSaveEvent = async (eventData: EventData) => {
-    // Create event object
+    // Create event object for local state
     const newEvent = {
       id: `temp-${Date.now()}`, // Temporary ID until server assigns one
       title: eventData.title,
@@ -443,7 +443,7 @@ function GoogleCalendar() {
         private: {
           ...(eventData.isTask && {
             deadline: eventData.end.toISOString(),
-            estimatedDuration: "60", // Default duration in minutes
+            estimatedDuration: eventData.estimatedDuration?.toString() || "60", // Use provided duration or default
           }),
         },
       },
@@ -460,50 +460,75 @@ function GoogleCalendar() {
     }
 
     try {
-      // Format event data for API
+      // Format guest emails for Google Calendar API
+      const attendees =
+        eventData.guests?.map((email) => ({ email: email.trim() })) || [];
+
+      // Format event data for API - follow Google Calendar API format
       const apiEventData = {
-        summary: eventData.title,
-        description: eventData.description,
-        start: {
-          dateTime: eventData.allDay
-            ? undefined
-            : eventData.start.toISOString(),
-          date: eventData.allDay
-            ? eventData.start.toISOString().split("T")[0]
-            : undefined,
-          timeZone: "America/Los_Angeles",
-        },
-        end: {
-          dateTime: eventData.allDay ? undefined : eventData.end.toISOString(),
-          date: eventData.allDay
-            ? eventData.end.toISOString().split("T")[0]
-            : undefined,
-          timeZone: "America/Los_Angeles",
-        },
-        location: eventData.location,
-        extendedProperties: {
-          private: {
-            ...(eventData.isTask && {
-              deadline: eventData.end.toISOString(),
-              estimatedDuration: "60", // Default duration in minutes
-            }),
+        eventDetails: {
+          summary: eventData.title,
+          description: eventData.description,
+          start: {
+            dateTime: eventData.allDay
+              ? undefined
+              : eventData.start.toISOString(),
+            date: eventData.allDay
+              ? eventData.start.toISOString().split("T")[0]
+              : undefined,
+            timeZone: "America/Los_Angeles",
+          },
+          end: {
+            dateTime: eventData.allDay
+              ? undefined
+              : eventData.end.toISOString(),
+            date: eventData.allDay
+              ? eventData.end.toISOString().split("T")[0]
+              : undefined,
+            timeZone: "America/Los_Angeles",
+          },
+          // Only include these fields if they have values
+          ...(eventData.location && { location: eventData.location }),
+          ...(attendees.length > 0 && { attendees }),
+          ...(eventData.webLink && { source: { url: eventData.webLink } }),
+          extendedProperties: {
+            private: {
+              ...(eventData.isTask && {
+                deadline: eventData.end.toISOString(),
+                estimatedDuration:
+                  eventData.estimatedDuration?.toString() || "60",
+              }),
+            },
           },
         },
       };
 
+      console.log("Sending event data:", JSON.stringify(apiEventData, null, 2));
+      console.log("Using token:", token.substring(0, 10) + "...");
+
       const response = await fetch("http://localhost:8080/calendar/event", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Use Bearer format for auth
           "Content-Type": "application/json",
         },
         body: JSON.stringify(apiEventData),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error adding event:", errorData);
-        alert("Failed to add event to calendar.");
+        let errorMessage = "Failed to add event to calendar.";
+        try {
+          const errorData = await response.json();
+          console.error("Error adding event:", errorData);
+          errorMessage = errorData.details || errorData.error || errorMessage;
+        } catch (e) {
+          console.error("Error parsing error response:", e);
+        }
+        alert(errorMessage);
+        // Remove the temporary event from local state
+        setEvents((prevEvents) =>
+          prevEvents.filter((e) => e.id !== newEvent.id)
+        );
         return;
       }
 
@@ -537,7 +562,12 @@ function GoogleCalendar() {
       console.log("Event added successfully:", serverEvent);
     } catch (error) {
       console.error("Error submitting event:", error);
-      alert("Error submitting event");
+      alert(
+        "Error submitting event: " +
+          (error instanceof Error ? error.message : String(error))
+      );
+      // Remove the temporary event if there was an error
+      setEvents((prevEvents) => prevEvents.filter((e) => e.id !== newEvent.id));
     }
   };
 

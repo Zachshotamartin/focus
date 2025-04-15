@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import styles from "./eventModal.module.css";
 import { IoCloseOutline } from "react-icons/io5";
 import { AiOutlineClockCircle, AiOutlineEnvironment } from "react-icons/ai";
-import { FiUsers, FiVideo, FiAlignLeft } from "react-icons/fi";
-import { FaRegCalendarAlt } from "react-icons/fa";
+import { FiUsers, FiAlignLeft } from "react-icons/fi";
+import { FaRegCalendarAlt, FaLink } from "react-icons/fa";
 
 interface EventModalProps {
   isOpen: boolean;
@@ -22,7 +22,9 @@ export interface EventData {
   allDay: boolean;
   location?: string;
   guests?: string[];
+  webLink?: string;
   isTask: boolean;
+  estimatedDuration?: number;
 }
 
 const EventModal: React.FC<EventModalProps> = ({
@@ -40,7 +42,9 @@ const EventModal: React.FC<EventModalProps> = ({
   const [allDay, setAllDay] = useState(false);
   const [location, setLocation] = useState("");
   const [guests, setGuests] = useState<string[]>([]);
+  const [webLink, setWebLink] = useState("");
   const [isTask, setIsTask] = useState(false);
+  const [estimatedDuration, setEstimatedDuration] = useState(1);
   const [activeTab, setActiveTab] = useState<"event" | "task">("event");
   const [inputGuest, setInputGuest] = useState("");
   const [showTimePicker, setShowTimePicker] = useState(!allDay);
@@ -81,6 +85,16 @@ const EventModal: React.FC<EventModalProps> = ({
     };
   }, [isOpen, onClose]);
 
+  // Update active tab to match isTask state
+  useEffect(() => {
+    setActiveTab(isTask ? "task" : "event");
+  }, [isTask]);
+
+  // Update isTask state when active tab changes
+  useEffect(() => {
+    setIsTask(activeTab === "task");
+  }, [activeTab]);
+
   const handleAddGuest = () => {
     if (inputGuest && !guests.includes(inputGuest)) {
       setGuests([...guests, inputGuest]);
@@ -98,15 +112,24 @@ const EventModal: React.FC<EventModalProps> = ({
       return;
     }
 
+    // Calculate end time for tasks with estimated duration
+    let finalEnd = end;
+    if (isTask && estimatedDuration > 0) {
+      // Add estimatedDuration hours to start time for tasks
+      finalEnd = new Date(start.getTime() + estimatedDuration * 60 * 60 * 1000);
+    }
+
     onSave({
       title,
       description,
       start,
-      end,
+      end: finalEnd,
       allDay,
       location,
       guests,
+      webLink,
       isTask: activeTab === "task",
+      ...(isTask && { estimatedDuration }),
     });
 
     // Reset form
@@ -114,7 +137,9 @@ const EventModal: React.FC<EventModalProps> = ({
     setDescription("");
     setLocation("");
     setGuests([]);
+    setWebLink("");
     setIsTask(false);
+    setEstimatedDuration(1);
     onClose();
   };
 
@@ -292,6 +317,27 @@ const EventModal: React.FC<EventModalProps> = ({
             </div>
           )}
 
+          {isTask && (
+            <div className={styles.optionRow}>
+              <div className={styles.icon}>
+                <AiOutlineClockCircle />
+              </div>
+              <div className={styles.durationContainer}>
+                <label>Estimated Duration (hours):</label>
+                <input
+                  type="number"
+                  min="0.25"
+                  step="0.25"
+                  value={estimatedDuration}
+                  onChange={(e) =>
+                    setEstimatedDuration(parseFloat(e.target.value))
+                  }
+                  className={styles.durationInput}
+                />
+              </div>
+            </div>
+          )}
+
           <div className={styles.optionRow}>
             <div className={styles.icon}>
               <AiOutlineEnvironment />
@@ -312,7 +358,7 @@ const EventModal: React.FC<EventModalProps> = ({
             <input
               type="text"
               className={styles.optionInput}
-              placeholder="Add guests"
+              placeholder="Add guests (email addresses)"
               value={inputGuest}
               onChange={(e) => setInputGuest(e.target.value)}
               onKeyDown={(e) => {
@@ -322,6 +368,11 @@ const EventModal: React.FC<EventModalProps> = ({
                 }
               }}
             />
+            {inputGuest && (
+              <button className={styles.addButton} onClick={handleAddGuest}>
+                Add
+              </button>
+            )}
           </div>
 
           {guests.length > 0 && (
@@ -342,11 +393,15 @@ const EventModal: React.FC<EventModalProps> = ({
 
           <div className={styles.optionRow}>
             <div className={styles.icon}>
-              <FiVideo />
+              <FaLink />
             </div>
-            <div className={styles.optionText}>
-              Add Google Meet video conferencing
-            </div>
+            <input
+              type="url"
+              className={styles.optionInput}
+              placeholder="Add web link"
+              value={webLink}
+              onChange={(e) => setWebLink(e.target.value)}
+            />
           </div>
 
           <div className={styles.optionRow}>
