@@ -1,13 +1,90 @@
 .taskContainer {
-  background-color: #475569;
+  background-color: var(--color-surface);
   color: white;
-  border-radius: 10px;
-  padding: 1rem;
-  margin: 1rem;
-  flex: 1;
-
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  width: 100%;
+  max-width: 20rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  gap: 0.75rem;
+}
+
+.taskContainer:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.taskTitle {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.taskDescription {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+  margin: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.taskActions {
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.taskStatus {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: 500;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.taskStatus.completed {
+  background-color: var(--color-success);
+}
+
+.taskStatus.pending {
+  background-color: var(--color-secondary);
+}
+
+.taskStatus.overdue {
+  background-color: var(--color-danger);
+}
+
+@media (max-width: 768px) {
+  .taskContainer {
+    max-width: 100%;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .taskContainer {
+    padding: 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .taskActions {
+    flex-wrap: wrap;
+  }
 }

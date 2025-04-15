@@ -108,7 +108,7 @@ const PrivacyPolicy = () => {
         This Privacy Policy ensures transparency and protects your privacy while
         using Focus. Thank you for trusting us to help manage your schedule!
       </p>
-      <button onClick={() => navigate("/")}>Back to Home</button>
+      <button className={styles.backButton} onClick={() => navigate("/")}>Back to Home</button>
     </div>
   );
 };

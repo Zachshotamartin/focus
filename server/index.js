@@ -263,7 +263,9 @@ app.post("/schedule/ai-suggest", async (req, res) => {
         eventDetails.summary
       }, Estimated duration is ${
       eventDetails.estimatedDuration
-    } hour, and the deadline is ${eventDetails.deadline}.
+    } hours, and the deadline is ${
+      eventDetails.deadline
+    }. Make sure you consider the duration and deadline strictly.
       The preferred time is ${eventDetails.preferences.beforeOrAfter} ${
       eventDetails.preferences.timePreference
     }. Here is some extra context to help you make your decision: ${

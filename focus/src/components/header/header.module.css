@@ -4,9 +4,13 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  background-color: #1a1a1a;
-  padding-bottom: 2rem;
-  border-bottom: 2px solid white;
+  background-color: var(--color-bg);
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
 }
 
 .left {
@@ -14,30 +18,38 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  padding-top: 2rem;
 }
 
 .right {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
 }
 
 .titleContainer {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-
-  height: 4rem;
+  gap: 0.75rem;
+  height: 3rem;
 }
 
 .title {
-  font-size: 3rem;
-  font-weight: bold;
+  font-size: 2rem;
+  font-weight: 700;
   color: white;
   text-align: left;
-  padding-left: 1rem;
+  margin: 0;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .profileContainer {
@@ -45,29 +57,89 @@
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  padding-left: 2rem;
-  
-
-  height: 2rem;
+  gap: 1rem;
 }
 
 .email {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-right: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
   color: white;
 }
 
 .profileImage {
-  width: 30px; /* Adjust size */
-  height: 30px; /* Adjust size */
-  border-radius: 10px;
-  margin-left: 2rem; /* Space between the text and image */
-  margin-right: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-primary);
+  transition: all var(--transition);
+}
+
+.profileImage:hover {
+  transform: scale(1.05);
+  border-color: var(--color-primary-hover);
 }
 
 .logo {
-  width: 50px; /* Adjust size */
-  height: 50px; /* Adjust size */
-  margin-left: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  transition: transform var(--transition);
+}
+
+.logo:hover {
+  transform: rotate(5deg) scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .email {
+    font-size: 0.9rem;
+  }
+
+  .profileImage {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .logo {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .right {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .profileImage {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .logo {
+    width: 2rem;
+    height: 2rem;
+  }
 }

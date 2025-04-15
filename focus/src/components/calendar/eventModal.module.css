@@ -1,0 +1,436 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  z-index: 2000;
+}
+
+.modal {
+  background-color: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  margin-left: 10px;
+  border: 1px solid var(--color-border);
+  z-index: 2001;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tabContainer {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.tabButton {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  flex: 1;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.tabButton:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.activeTab {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.activeTab::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-primary);
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.25rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.modalBody {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.titleInput {
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: 1.1rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.titleInput:focus {
+  outline: none;
+  border-bottom-color: var(--color-primary);
+}
+
+.dateTimeRow,
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.icon {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+}
+
+.dateTimeInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.timeText {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+}
+
+.addTimeButton {
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.addTimeButton:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.optionInput {
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+  width: 100%;
+  border-bottom: 1px solid transparent;
+}
+
+.optionInput:focus {
+  outline: none;
+  border-bottom-color: var(--color-border);
+}
+
+.optionText {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.optionText:hover {
+  color: var(--color-primary);
+}
+
+.descriptionInput {
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+  width: 100%;
+  resize: none;
+  border-bottom: 1px solid transparent;
+}
+
+.descriptionInput:focus {
+  outline: none;
+  border-bottom-color: var(--color-border);
+}
+
+.guestList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.25rem 0 0.25rem 2.5rem;
+}
+
+.guestChip {
+  background-color: var(--color-surface-hover);
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.removeGuestButton {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.removeGuestButton:hover {
+  color: var(--color-text);
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.optionSwitches {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 18px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-border);
+  transition: 0.4s;
+  border-radius: 18px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--color-primary);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--color-primary);
+}
+
+input:checked + .slider:before {
+  transform: translateX(16px);
+}
+
+.saveButton {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.saveButton:hover {
+  background-color: var(--color-primary-hover);
+}
+
+@media (max-width: 600px) {
+  .modal {
+    width: 90%;
+    margin: 5% auto;
+    max-height: 80vh;
+  }
+}
+
+.timePickerRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0 0.5rem 2.5rem;
+}
+
+.timePickerColumn {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.timePickerColumn label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.timeInput {
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  padding: 0.5rem;
+  width: 100%;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.timeInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.dateInput {
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  padding: 0.5rem;
+  width: 100%;
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.eventTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  padding: 0;
+  color: var(--color-text);
+}
+
+.detailRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  position: relative;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.detailText {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.editButton,
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.editButton {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+}
+
+.editButton:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.deleteButton {
+  background-color: transparent;
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+}
+
+.deleteButton:hover {
+  background-color: var(--color-danger);
+  color: white;
+}

@@ -86,6 +86,20 @@ const eventsSlice = createSlice({
     setFreeBusy: (state, action: PayloadAction<any[]>) => {
       state.freebusy = action.payload;
     },
+    updateCalendarEvent: (state, action) => {
+      const updatedEvent = action.payload;
+      // Update the event in the events array
+      state.events = state.events.map((event) =>
+        event.id === updatedEvent.id ? updatedEvent : event
+      );
+
+      // If it's also a task, update in tasks array
+      if (updatedEvent.extendedProperties?.private?.deadline) {
+        state.tasks = state.tasks.map((task) =>
+          task.id === updatedEvent.id ? updatedEvent : task
+        );
+      }
+    },
   },
 });
 
@@ -99,6 +113,7 @@ export const {
   removeTask,
   setFreeBusy,
   updateGPTConversation,
+  updateCalendarEvent,
 } = eventsSlice.actions;
 
 export default eventsSlice.reducer;

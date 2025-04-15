@@ -1,17 +1,13 @@
 .calendar {
   flex: 6;
   height: 100%;
-  width: 100%; /* Full width of parent container */
+  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Optional: Center the calendar */
-  align-items: flex-start; /* Optional: Center the calendar */
-  background-color: #2b2b2b; /* Light gray background like Google Calendar */
-
-  padding-top: 1rem;
-  padding-left: 2rem;
-  padding-right: 2rem;
-  padding-bottom: 2rem;
+  justify-content: flex-start;
+  align-items: flex-start;
+  background-color: var(--color-bg);
+  padding: 2rem;
 }
 
 .tasks {
@@ -19,69 +15,137 @@
   justify-content: center;
   align-items: flex-start;
   align-self: flex-start;
-
-  padding-top: 1rem;
   height: 100%;
   width: 100%;
   scrollbar-color: transparent transparent;
 }
+
 .quickAdd {
   flex: 1;
-  height: 100%;
-  width: 50%; /* Full width of parent container */
+  width: 50%;
   display: flex;
   flex-direction: row;
-  justify-content: center; /* Optional: Center the calendar */
-  align-items: center; /* Optional: Center the calendar */
-  background-color: #2b2b2b; /* Light gray background like Google Calendar */
-  padding-bottom: 1rem;
-  padding-top: 1rem;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem 0.75rem;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition);
+  position: relative;
 }
+
+.quickAdd:focus-within {
+  box-shadow: var(--shadow);
+  border-color: var(--color-primary);
+}
+
 .naturalLanguageInput {
   flex: 1;
-  height: 100%;
-  width: 100%; /* Full width of parent container */
-  display: flex;
-  flex-direction: row;
-  justify-content: center; /* Optional: Center the calendar */
-  align-items: center; /* Optional: Center the calendar */
-  background-color: #2b2b2b; /* Light gray background like Google Calendar */
-  border: 1px solid white;
-  border-radius: 10px;
-  margin-right: 1rem;
-  resize: none;
-  font-size: 1rem;
+  height: 42px;
+  min-width: 250px;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.05rem;
+  padding: 0 0.5rem;
+  transition: all var(--transition);
+  color: var(--color-text);
+  position: relative;
+}
 
-  padding-left: 0.5rem;
+.naturalLanguageInput:focus {
+  outline: none;
+}
+
+.naturalLanguageInput::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.button {
+  height: 42px;
+  padding: 0 1.25rem;
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  border-radius: var(--radius);
+  transition: all var(--transition);
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.button:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.button:active {
+  transform: translateY(0);
+  background-color: var(--color-primary-active);
 }
 
 .tasksContainer {
   flex: 1;
   height: 95%;
-  width: 100%; /* Full width of parent container */
+  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Optional: Center the calendar */
-  align-items: flex-start; /* Optional: Center the calendar */
+  justify-content: flex-start;
+  align-items: flex-start;
 }
-/* Toolbar (navigation bar) */
 
 .taskList {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-left: 0;
+  margin-top: 0;
+  gap: 1.5rem;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.taskList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.taskList::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 3px;
+}
+
+.taskList::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-primary);
 }
 
 .calendarWrapper {
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   position: relative;
-  z-index: 100;
+  z-index: 1;
   background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.422);
+  border: 1px solid var(--color-border);
   height: 100%;
   width: 100%;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+
+.calendarWrapper:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary-hover);
 }
 
 .profileContainer {
@@ -91,27 +155,31 @@
   justify-content: flex-start;
   padding-left: 2rem;
   width: 50%;
-
   height: 100%;
 }
 
 .email {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-right: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
   color: white;
+  margin-right: 1rem;
 }
 
 .profileImage {
-  width: 2.5rem; /* Adjust size */
-  margin-top: .5rem;
-  height: 2.5rem; /* Adjust size */
-  border-radius: 10rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-top: 0.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  transition: all var(--transition);
+  object-fit: cover;
 }
 
 .profileImage:hover {
   cursor: pointer;
-  box-shadow: 0px 0px 10px #475569;
+  transform: scale(1.05);
+  border-color: var(--color-primary-hover);
+  box-shadow: var(--shadow);
 }
 
 .topRow {
@@ -120,11 +188,39 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.IsCalendarViewButtonContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.IsCalendarViewButtonContainer button {
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: all var(--transition);
+  font-size: 0.95rem;
 }
 
 .selected {
-  background-color: #475569;
+  background-color: var(--color-primary);
   color: white;
+  box-shadow: var(--shadow);
+}
+
+.IsCalendarViewButtonContainer button:not(.selected) {
+  background-color: var(--color-surface);
+  color: white;
+}
+
+.IsCalendarViewButtonContainer button:not(.selected):hover {
+  background-color: var(--color-surface-hover);
+  transform: translateY(-1px);
 }
 
 .userSettings {
@@ -136,21 +232,30 @@
   right: 2rem;
   top: 5rem;
   z-index: 100;
-  border-radius: 10px;
-  padding: 1rem;
-  border: 1px solid white;
-  background-color: #2b2b2b;
-  box-shadow: 0px 0px 10px #475569;
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-lg);
   color: white;
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
+  transition: all var(--transition);
+  min-width: 180px;
+}
+
+.userSettings:hover {
+  border-color: var(--color-primary);
 }
 
 .settingsPicture {
   width: 5rem;
   height: 5rem;
-  border-radius: 10rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-primary);
+  margin-bottom: 0.75rem;
 }
 
 .options {
@@ -158,6 +263,180 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.options button {
+  width: 100%;
+  padding: 0.6rem;
+  text-align: center;
+}
+
+/* Focus Mode Task Styling */
+.focusTaskContainer {
+  background-color: rgba(71, 85, 105, 0.6);
+  backdrop-filter: blur(5px);
+  color: white;
+  border-radius: var(--radius);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  width: 100%;
+  height: 100%;
+  position: relative;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  gap: 1rem;
+}
+
+.focusTaskTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 1rem;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.focusTaskInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
   width: 100%;
+  max-width: 600px;
+}
+
+.focusTaskDeadline,
+.focusTaskDuration {
+  font-size: 1rem;
+  color: var(--color-muted);
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  text-align: center;
+}
+
+.focusTaskButtonContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.focusTaskButton {
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  transition: all var(--transition);
+  min-width: 160px;
+}
+
+.nextButton {
+  background-color: var(--color-primary);
+}
+
+.nextButton:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.completedButton {
+  background-color: var(--color-success);
+}
+
+.completedButton:hover {
+  background-color: var(--color-success-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.inputIcon {
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.button:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .calendar {
+    padding: 1.5rem;
+  }
+
+  .topRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .quickAdd {
+    width: 100%;
+  }
+
+  .IsCalendarViewButtonContainer {
+    width: 100%;
+  }
+
+  .IsCalendarViewButtonContainer button {
+    flex: 1;
+  }
+
+  .profileContainer {
+    width: 100%;
+    padding-left: 0;
+    align-items: flex-start;
+  }
+
+  .focusTaskTitle {
+    font-size: 1.75rem;
+  }
+
+  .focusTaskButtonContainer {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .focusTaskButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar {
+    padding: 1rem;
+  }
+
+  .taskList {
+    gap: 1rem;
+  }
+
+  .focusTaskContainer {
+    padding: 1.5rem;
+  }
+
+  .focusTaskTitle {
+    font-size: 1.5rem;
+  }
 }

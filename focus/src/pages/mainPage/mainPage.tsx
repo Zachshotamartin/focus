@@ -173,13 +173,15 @@ const MainPage = () => {
         const responseData = await response.json();
         console.log("Response Data:", responseData);
 
+        const isAllDay = !!responseData.event.start.date; // Check if 'start.date' exists
+
         const event = {
           id: responseData.event.id, // Use the id from the backend response
           title: responseData.event.summary,
           start:
-            responseData.event.start.dateTime || responseData.event.start.date,
-          end: responseData.event.end.dateTime || responseData.event.end.date,
-          allDay: !responseData.event.start.dateTime,
+            responseData.event.start.dateTime || responseData.event.start.date, // Use dateTime or date
+          end: responseData.event.end.dateTime || responseData.event.end.date, // Use dateTime or date
+          allDay: isAllDay, // Set allDay based on the presence of start.date
           description: responseData.event.description,
           extendedProperties: responseData.event.extendedProperties,
         };

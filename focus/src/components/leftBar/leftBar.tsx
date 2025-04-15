@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./leftBar.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -9,6 +9,7 @@ import {
 } from "../../reducers/eventsSlice";
 import { setIsCalendarView } from "../../reducers/pageStateSlice";
 import logo from "../../assets/logo.png";
+
 const LeftBar = ({
   onSubmitEvent,
 }: {
@@ -17,14 +18,22 @@ const LeftBar = ({
   const [eventDetails, setEventDetails] = useState({
     summary: "",
     description: "",
+    allDay: false,
     start: "",
     end: "",
     timeZone: "America/Los_Angeles",
-    estimatedDuration: 0, // Added estimatedDuration field
-    deadline: "", // Added deadline field
+    estimatedDuration: 0,
+    deadline: "",
     beforeOrAfter: "before",
     timePreference: "12:00 AM",
   });
+
+  // State for resizable left bar
+  const [width, setWidth] = useState(320);
+  const [isDragging, setIsDragging] = useState(false);
+  const leftBarRef = useRef<HTMLDivElement>(null);
+  const startXRef = useRef<number>(0);
+  const startWidthRef = useRef<number>(0);
 
   const dispatch = useDispatch();
 
@@ -33,16 +42,49 @@ const LeftBar = ({
     (state: any) => state.pageState.isCalendarView
   );
   const tasks = useSelector((state: any) => state.events.tasks);
-  //const freeBusy = useSelector((state: any) => state.events.freebusy);
   const [autoSchedule, setAutoSchedule] = useState(false);
 
+  // Handle mouse down on resize handle
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    startXRef.current = e.clientX;
+    startWidthRef.current = width;
+    document.body.style.cursor = "ew-resize";
+  };
+
+  // Handle mouse move during resize
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+
+      const deltaX = e.clientX - startXRef.current;
+      const newWidth = Math.max(
+        240,
+        Math.min(500, startWidthRef.current + deltaX)
+      );
+      setWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      document.body.style.cursor = "default";
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
+
   const handleDelete = async () => {
-    console.log("selectedEvent", selectedEvent._def.publicId);
-    console.log("selectedEvent", selectedEvent);
-    const id = selectedEvent._def.publicId;
+    console.log("selectedEvent", selectedEvent?._def?.publicId);
     if (selectedEvent) {
+      const id = selectedEvent._def.publicId;
       const token = localStorage.getItem("user_token");
-      console.log("Token:", token);
       if (token) {
         try {
           const response = await fetch(
@@ -60,7 +102,6 @@ const LeftBar = ({
             console.log("Event deleted successfully");
             dispatch(removeTask(selectedEvent));
             dispatch(removeCalendarEvent(id));
-            console.log("event removed");
           } else {
             console.error("Failed to delete event");
           }
@@ -77,9 +118,10 @@ const LeftBar = ({
     const { name, value } = e.target;
     setEventDetails((prev) => ({
       ...prev,
-      [name]: name === "estimatedDuration" ? parseFloat(value) : value, // Parse duration as float
+      [name]: name === "estimatedDuration" ? parseFloat(value) : value,
     }));
   };
+
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setEventDetails((prev) => ({
@@ -94,32 +136,33 @@ const LeftBar = ({
     const formattedEvent = {
       summary: eventDetails.summary,
       description: eventDetails.description,
-      start: {
-        dateTime: new Date(eventDetails.start).toISOString(),
-        timeZone: eventDetails.timeZone,
-      },
-      end: {
-        dateTime: new Date(eventDetails.end).toISOString(),
-        timeZone: eventDetails.timeZone,
-      },
+      ...(eventDetails.allDay
+        ? {
+            start: {
+              date: eventDetails.start,
+            },
+            end: {
+              date: eventDetails.end,
+            },
+          }
+        : {
+            start: {
+              dateTime: new Date(eventDetails.start).toISOString(),
+              timeZone: eventDetails.timeZone,
+            },
+            end: {
+              dateTime: new Date(eventDetails.end).toISOString(),
+              timeZone: eventDetails.timeZone,
+            },
+          }),
     };
 
-    onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: [] }); // Call the provided function
-    setEventDetails({
-      summary: "",
-      description: "",
-      start: "",
-      end: "",
-      timeZone: "America/Los_Angeles",
-      estimatedDuration: 0,
-      deadline: "",
-      beforeOrAfter: "before",
-      timePreference: "12:00 AM",
-    });
+    onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: [] });
+    resetForm();
   };
+
   const handleFetchFreeBusy = async () => {
     const token = localStorage.getItem("user_token");
-    console.log(token);
     if (!token) {
       alert("User token is missing.");
       return;
@@ -129,7 +172,7 @@ const LeftBar = ({
       const timeMin = new Date().toISOString();
       const timeMax = new Date(
         new Date().getTime() + 24 * 60 * 60 * 1000 * 14
-      ).toISOString(); // 24 hours from now
+      ).toISOString(); // 14 days from now
 
       const response = await fetch(
         "https://www.googleapis.com/calendar/v3/freeBusy",
@@ -150,9 +193,6 @@ const LeftBar = ({
 
       if (response.ok) {
         const data = await response.json();
-        console.log("FreeBusy Data:", data);
-
-        // Dispatch free/busy data to Redux
         dispatch(setFreeBusy(data.calendars.primary.busy || []));
         return data.calendars.primary.busy || [];
       } else {
@@ -164,6 +204,7 @@ const LeftBar = ({
       alert("Error fetching free/busy data.");
     }
   };
+
   const handleAutoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const freeBusy = await handleFetchFreeBusy();
@@ -172,8 +213,8 @@ const LeftBar = ({
       description: eventDetails.description,
       extendedProperties: {
         private: {
-          estimatedDuration: eventDetails.estimatedDuration, // Include estimated duration
-          deadline: eventDetails.deadline || null, // Include deadline if provided
+          estimatedDuration: eventDetails.estimatedDuration,
+          deadline: eventDetails.deadline || null,
         },
       },
       preferences: {
@@ -181,6 +222,7 @@ const LeftBar = ({
         timePreference: eventDetails.timePreference,
       },
     };
+
     if (
       formattedEvent.extendedProperties.private.deadline &&
       formattedEvent.extendedProperties.private.deadline <=
@@ -189,13 +231,16 @@ const LeftBar = ({
       alert("Deadline is in the past. Please choose a future date.");
       return;
     }
-    console.log("format", formattedEvent);
 
-    onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: freeBusy }); // Call the provided function
-    console.log(freeBusy);
+    onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: freeBusy });
+    resetForm();
+  };
+
+  const resetForm = () => {
     setEventDetails({
       summary: "",
       description: "",
+      allDay: false,
       start: "",
       end: "",
       timeZone: "America/Los_Angeles",
@@ -214,22 +259,32 @@ const LeftBar = ({
         description: "Description",
         extendedProperties: {
           private: {
-            estimatedDuration: 1, // Include estimated duration
-            deadline: new Date().toISOString(), // Include deadline if provided
+            estimatedDuration: 1,
+            deadline: new Date().toISOString(),
           },
         },
       };
       const freeBusy = await handleFetchFreeBusy();
-      onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: freeBusy }); // Call the provided function
+      onSubmitEvent({ formattedEvent: formattedEvent, freeBusy: freeBusy });
     }
   };
 
   return (
-    <div className={styles.leftBar}>
+    <div
+      className={styles.leftBar}
+      ref={leftBarRef}
+      style={{
+        width: `${width}px`,
+        maxWidth: isDragging ? "none" : `${width}px`,
+      }}
+    >
+      {/* App Header */}
       <div className={styles.titleContainer}>
         <img src={logo} alt="Logo" className={styles.logo} />
         <h1 className={styles.title}>Focus</h1>
       </div>
+
+      {/* View Switcher */}
       <div className={styles.pageStateButtonContainer}>
         <button
           className={isCalendarView ? styles.selected : ""}
@@ -245,7 +300,11 @@ const LeftBar = ({
         </button>
       </div>
 
+      {/* Event Creation Section */}
       <h2>Create Event</h2>
+
+      {/* Auto/Manual Switch */}
+      <div className={styles.modeToggleLabel}>Choose scheduling method:</div>
       <div className={styles.buttonContainer}>
         <button
           className={autoSchedule ? styles.selected : ""}
@@ -260,6 +319,8 @@ const LeftBar = ({
           Manual
         </button>
       </div>
+
+      {/* Form Sections */}
       {!autoSchedule && (
         <form onSubmit={handleSubmit} className={styles.form}>
           <div>
@@ -271,8 +332,10 @@ const LeftBar = ({
               value={eventDetails.summary}
               onChange={handleChange}
               required
+              placeholder="Enter event title"
             />
           </div>
+
           <div>
             <label htmlFor="description">Description:</label>
             <textarea
@@ -280,12 +343,34 @@ const LeftBar = ({
               name="description"
               value={eventDetails.description}
               onChange={handleChange}
+              placeholder="Enter event details"
             />
           </div>
-          <div>
-            <label htmlFor="start">Start Time:</label>
+
+          <div className={styles.checkboxContainer}>
+            <label className={styles.checkboxLabel} htmlFor="allDay">
+              All Day Event
+            </label>
             <input
-              type="datetime-local"
+              type="checkbox"
+              id="allDay"
+              name="allDay"
+              checked={eventDetails.allDay}
+              onChange={() => {
+                setEventDetails({
+                  ...eventDetails,
+                  allDay: !eventDetails.allDay,
+                });
+              }}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="start">
+              {eventDetails.allDay ? "Start Date:" : "Start Time:"}
+            </label>
+            <input
+              type={eventDetails.allDay ? "date" : "datetime-local"}
               id="start"
               name="start"
               value={eventDetails.start}
@@ -293,10 +378,13 @@ const LeftBar = ({
               required
             />
           </div>
+
           <div>
-            <label htmlFor="end">End Time:</label>
+            <label htmlFor="end">
+              {eventDetails.allDay ? "End Date:" : "End Time:"}
+            </label>
             <input
-              type="datetime-local"
+              type={eventDetails.allDay ? "date" : "datetime-local"}
               id="end"
               name="end"
               value={eventDetails.end}
@@ -304,11 +392,13 @@ const LeftBar = ({
               required
             />
           </div>
+
           <button className={styles.button} type="submit">
             Add Event
           </button>
         </form>
       )}
+
       {autoSchedule && (
         <form onSubmit={handleAutoSubmit} className={styles.form}>
           <div>
@@ -320,8 +410,10 @@ const LeftBar = ({
               value={eventDetails.summary}
               onChange={handleChange}
               required
+              placeholder="Enter event title"
             />
           </div>
+
           <div>
             <label htmlFor="description">Description:</label>
             <textarea
@@ -329,11 +421,15 @@ const LeftBar = ({
               name="description"
               value={eventDetails.description}
               onChange={handleChange}
+              placeholder="Enter event details"
             />
           </div>
+
           <div>
             <label htmlFor="timePreference">Time Preference:</label>
-            <div style={{ display: "flex", flexDirection: "row", gap: "1rem" }}>
+            <div
+              style={{ display: "flex", flexDirection: "row", gap: "0.5rem" }}
+            >
               <select
                 id="beforeOrAfter"
                 name="beforeOrAfter"
@@ -354,6 +450,7 @@ const LeftBar = ({
               />
             </div>
           </div>
+
           <div>
             <label htmlFor="estimatedDuration">
               Estimated Duration (hours):
@@ -367,8 +464,10 @@ const LeftBar = ({
               step="0.1"
               min="0"
               required
+              placeholder="0.0"
             />
           </div>
+
           <div>
             <label htmlFor="deadline">Deadline:</label>
             <input
@@ -380,17 +479,29 @@ const LeftBar = ({
               required
             />
           </div>
+
           <button className={styles.button} type="submit">
             Add Event
           </button>
         </form>
       )}
-      <button className={styles.buttonBottom} onClick={handleDelete}>
-        Delete Event
-      </button>
-      <button className={styles.buttonBottom} onClick={handleTestAdd}>
-        Test Add
-      </button>
+
+      {/* Action Buttons */}
+      <div>
+        <button
+          className={styles.buttonBottom}
+          onClick={handleDelete}
+          disabled={!selectedEvent}
+        >
+          Delete Event
+        </button>
+        <button className={styles.buttonBottom} onClick={handleTestAdd}>
+          Test Add
+        </button>
+      </div>
+
+      {/* Resize Handle */}
+      <div className={styles.resizeHandle} onMouseDown={handleMouseDown} />
     </div>
   );
 };
